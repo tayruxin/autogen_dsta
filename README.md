@@ -62,7 +62,7 @@ There are 3 different infrastrucutures in the codebase.
 3. Update the model name according to the model that you downloaded from LM studio
 
 ```
-z llm_config = {
+# llm_config = {
 #     "config_list": [
 #         {
 #              "model": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF/mistral-7b-instruct-v0.2.Q4_K_S.gguf","base_url": "http://localhost:1234/v1", "api_key":"lm-studio"
