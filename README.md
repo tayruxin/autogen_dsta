@@ -30,6 +30,7 @@ There are 3 different infrastrucutures in the codebase.
 ## Environment
 -  Python 3.12.4
 - IDE: VSCode 
+- LM studio: To host the local model 
 
 ## Installation 
 1. **Clone the repository:**
@@ -47,3 +48,9 @@ There are 3 different infrastrucutures in the codebase.
     pip install -r requirements.txt
     ```
 
+
+## Usage 
+
+### Setting up LM studio 
+
+### Settign up Google key 
