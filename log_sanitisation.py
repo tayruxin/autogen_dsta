@@ -4,7 +4,9 @@ import google.generativeai as genai
 # from autogen.agentchat.contrib.retrieve_assistant_agent import RetrieveAssistantAgent
 # from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
 
-llm_config = {"model": "gemini-1.5-flash", "api_key":"AIzaSyAHNdDCfn5_lAqtw0QUdnmbhMFc6izHRJk", "api_type": "google"}
+llm_config = {"model": "gemini-1.5-flash", "api_key":"YOUR_API_KEY", "api_type": "google"}
+
+## Possible local LLM to explore 
 
 # llm_config = {
 #     "config_list": [

@@ -3,7 +3,9 @@ from autogen.agentchat.contrib.retrieve_assistant_agent import RetrieveAssistant
 from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
 from autogen import Agent 
 
-llm_config = {"model": "gemini-1.5-flash", "api_key":"AIzaSyAHNdDCfn5_lAqtw0QUdnmbhMFc6izHRJk", "api_type": "google"}
+llm_config = {"model": "gemini-1.5-flash", "api_key":"YOUR_API_KEY", "api_type": "google"}
+
+## Possible local LLM model to explore with 
 # llm_config = {
 #     "config_list": [
 #         {
@@ -56,7 +58,6 @@ ragproxyagent = RetrieveUserProxyAgent(
 checker = autogen.AssistantAgent("checker", 
                            llm_config=llm_config, 
                            system_message="your job here is to to look through the sanitized log file to check if there is any IP address that is not being cleaned up. do not terminate unless the user intervents.",
-                        #    code_execution_config={"last_n_messages": 2, "work_dir": "coding", "use_docker":False},
                            )
 
 def custom_speaker_selection_func(last_speaker: Agent, groupchat: autogen.GroupChat):
@@ -85,7 +86,7 @@ ragproxyagent.initiate_chat(
 
 
 
-
+## Possible prompts to insert for checker 
 
 # checker, check sanitized_pfirewall.log to see if we miss any IP address out. Write a python code to do so.
 
