@@ -1,0 +1,638 @@
+# IPv6 address - Wikipedia
+
+# IPv6 address
+
+Label to identify a network interface of a computer or other network node
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/7/70/Ipv6_address_leading_zeros.svg/300px-Ipv6_address_leading_zeros.svg.png)](/wiki/File:Ipv6_address_leading_zeros.svg)
+
+Decomposition of an IPv6 address into its [binary](/wiki/Binary_numeral_system "Binary numeral system") form
+
+An **Internet Protocol version 6 address** (**IPv6 address**) is a numeric label that is used to identify and locate a network interface of a computer or a [network node](/wiki/Node_(networking) "Node (networking)") participating in a [computer network](/wiki/Computer_network "Computer network") using [IPv6](/wiki/IPv6 "IPv6"). [IP addresses](/wiki/IP_address "IP address") are included in the [packet header](/wiki/IPv6_header "IPv6 header") to indicate the source and the destination of each packet. The IP address of the destination is used to make decisions about routing [IP packets](/wiki/IPv6_packet "IPv6 packet") to other networks.
+
+IPv6 is the successor to the first addressing infrastructure of the [Internet](/wiki/Internet "Internet"), [Internet Protocol version 4](/wiki/Internet_Protocol_version_4 "Internet Protocol version 4") (IPv4). In contrast to IPv4, which defined an IP address as a 32-bit value, IPv6 addresses have a size of 128 bits. Therefore, in comparison, IPv6 has a vastly enlarged [address space](/wiki/Address_space "Address space").
+
+Addressing methods
+------------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=1 "Edit section: Addressing methods")]
+IPv6 addresses are classified by the primary addressing and routing methodologies common in networking: unicast addressing, anycast addressing, and multicast addressing.[[1]](#cite_note-rfc4291-1)
+
+A [unicast](/wiki/Unicast "Unicast") address identifies a single network interface. The Internet Protocol delivers packets sent to a unicast address to that specific interface.
+
+An [anycast](/wiki/Anycast "Anycast") address is assigned to a group of interfaces, usually belonging to different nodes. A packet sent to an anycast address is delivered to just one of the member interfaces, typically the nearest host, according to the routing protocol's definition of distance. Anycast addresses cannot be identified easily, they have the same format as unicast addresses, and differ only by their presence in the network at multiple points. Almost any unicast address can be employed as an anycast address.
+
+A [multicast](/wiki/Multicast "Multicast") address is also used by multiple hosts that acquire the multicast address destination by participating in the multicast distribution protocol among the network routers. A packet that is sent to a [multicast address](/wiki/Multicast_address "Multicast address") is delivered to all interfaces that have joined the corresponding multicast group. IPv6 does not implement [broadcast addressing](/wiki/Broadcast_address "Broadcast address"). Broadcast's traditional role is subsumed by multicast addressing to the *all-nodes* link-local multicast group *ff02::1*. However, the use of the all-nodes group is not recommended, and most IPv6 protocols use protocol-specific link-local multicast groups to avoid disturbing every interface on a given network.
+
+Address formats
+---------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=2 "Edit section: Address formats")]
+An IPv6 address consists of 128 bits.[[1]](#cite_note-rfc4291-1) For each of the major addressing and routing methodologies, various address formats are recognized by dividing the 128 address bits into bit groups and using established rules for associating the values of these bit groups with special addressing features.
+
+### Unicast and anycast address format
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=3 "Edit section: Unicast and anycast address format")]
+[Unicast](/wiki/Unicast "Unicast") and [anycast](/wiki/Anycast "Anycast") addresses are typically composed of two logical parts: a 64-bit network prefix used for [routing](/wiki/Routing "Routing"), and a 64-bit interface identifier used to identify a host's network interface.
+
+General unicast address format (routing prefix size varies)
+
+| bits | 48 (or more) | 16 (or fewer) | 64 |
+| --- | --- | --- | --- |
+| field | *routing prefix* | *subnet ID* | *interface identifier* |
+
+The *network prefix* (the *routing prefix* combined with the *subnet ID*) is contained in the most significant 64 bits of the address. The size of the routing prefix may vary; a larger prefix size means a smaller subnet ID size. The bits of the *subnet ID* field are available to the network administrator to define subnets within the given network. The 64-bit *interface identifier* is automatically established randomly, obtained from a [DHCPv6](/wiki/DHCPv6 "DHCPv6") server, or assigned manually. (Historically, it was automatically generated from the interface's [MAC address](/wiki/MAC_address "MAC address") using the [modified EUI-64](#Modified_EUI-64) format, but this method is now not recommended for privacy reasons.[[2]](#cite_note-rfc8064-2))
+
+[Unique local addresses](/wiki/Unique_local_address "Unique local address") are addresses analogous to IPv4 [private network](/wiki/Private_network "Private network") addresses.
+
+Unique local address format
+
+| bits | 7 | 1 | 40 | 16 | 64 |
+| --- | --- | --- | --- | --- | --- |
+| field | *prefix* | *L* | *random* | *subnet ID* | *interface identifier* |
+
+The *prefix* field contains the binary value 1111110. The *L* bit is one for locally assigned addresses; the address range with *L* set to zero is currently not defined. The *random* field is chosen randomly once, at the inception of the */48* routing prefix.
+
+A link-local address is also based on the interface identifier, but uses a different format for the network prefix.
+
+Link-local address format
+
+| bits | 10 | 54 | 64 |
+| --- | --- | --- | --- |
+| field | *prefix* | *zeroes* | *interface identifier* |
+
+The *prefix* field contains the binary value 1111111010. The 54 zeroes that follow make the total network prefix the same for all link-local addresses (*fe80::/64* [link-local address prefix](#Local_addresses)), rendering them non-routable.
+
+### Multicast address format
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=4 "Edit section: Multicast address format")]
+Further information: [Multicast address § IPv6](/wiki/Multicast_address#IPv6 "Multicast address")
+[Multicast](/wiki/Multicast "Multicast") addresses are formed according to several specific formatting rules, depending on the application.
+
+General multicast address format
+
+| bits | 8 | 4 | 4 | 112 |
+| --- | --- | --- | --- | --- |
+| field | *prefix* | *flg* | *[sc](#Address_scopes)* | *group ID* |
+
+For all multicast addresses, the *prefix* field holds the binary value 11111111.
+
+Currently, three of the four flag bits in the *flg* field are defined;[[1]](#cite_note-rfc4291-1) the most-significant flag bit is reserved for future use.
+
+Multicast address flags[[3]](#cite_note-IPv6Essentials-3)
+
+| bit | flag | Meaning when 0 | Meaning when 1 |
+| --- | --- | --- | --- |
+| 8 | *reserved* | *reserved* | *reserved* |
+| 9 | R (Rendezvous)[[4]](#cite_note-rfc3956-4) | Rendezvous point not embedded | Rendezvous point embedded |
+| 10 | P (Prefix)[[5]](#cite_note-rfc3306-5) | Without prefix information | Address based on network prefix |
+| 11 | T (Transient)[[1]](#cite_note-rfc4291-1) | Well-known multicast address | Dynamically assigned multicast address |
+
+The [four-bit scope field](#Address_scopes) (*sc*) is used to indicate where the address is valid and unique.
+
+In addition, the scope field is used to identify special multicast addresses, like [solicited node](/wiki/Solicited-node_multicast_address "Solicited-node multicast address").
+
+Solicited-node multicast address format
+
+| bits | 8 | 4 | 4 | 79 | 9 | 24 |
+| --- | --- | --- | --- | --- | --- | --- |
+| field | *prefix* | *flg* | *sc* | *zeroes* | *ones* | *unicast address* |
+
+The *sc(ope)* field holds the binary value 0010 (link-local). Solicited-node multicast addresses are computed as a function of a node's unicast or anycast addresses. A solicited-node multicast address is created by copying the last 24 bits of a unicast or anycast address to the last 24 bits of the multicast address.
+
+Unicast-prefix-based multicast address format[[4]](#cite_note-rfc3956-4)[[5]](#cite_note-rfc3306-5)
+
+| bits | 8 | 4 | 4 | 4 | 4 | 8 | 64 | 32 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| field | *prefix* | *flg* | *sc* | *res* | *riid* | *plen* | *network prefix* | *group ID* |
+
+Link-scoped multicast addresses use a comparable format.[[6]](#cite_note-rfc4489-6)
+
+Representation
+--------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=5 "Edit section: Representation")]
+An IPv6 address is represented as eight groups of four [hexadecimal](/wiki/Hexadecimal "Hexadecimal") digits, each group representing 16 [bits](/wiki/Bit "Bit")[[a]](#cite_note-9) The groups are separated by [colons](/wiki/Colon_(punctuation) "Colon (punctuation)") (:). An example of an IPv6 address is:
+
+*2001:0db8:85a3:0000:0000:8a2e:0370:7334*
+The standards provide flexibility in the representation of IPv6 addresses. The full representation of eight four-digit groups may be simplified by several techniques, eliminating parts of the representation. In general, representations are shortened as much as possible. However, this practice complicates several common operations, namely searching for a specific address or an address pattern in text documents or streams, and comparing addresses to determine equivalence. For mitigation of these complications, the IETF has defined a canonical format for rendering IPv6 addresses in text:[[9]](#cite_note-rfc5952-10)
+
+* The hexadecimal digits are always compared in case-insensitive manner, but IETF recommendations suggest the use of only lower case letters. For example, *2001:db8::1* is preferred over *2001:DB8::1*;
+* Leading zeros in each 16-bit field are suppressed, but each group must retain at least one digit. For example, *2001:0db8::0001:0000* is rendered as *2001:db8::1:0*;
+* The longest sequence of consecutive all-zero fields is replaced with two colons (*::*). If the address contains multiple runs of all-zero fields of the same size, to prevent ambiguities, it is the leftmost that is compressed. For example, *2001:db8:0:0:1:0:0:1* is rendered as *2001:db8::1:0:0:1* rather than as *2001:db8:0:0:1::1*. *::* is not used to represent just a single all-zero field. For example, *2001:db8:0:0:0:0:2:1* is shortened to *2001:db8::2:1*, but *2001:db8:0000:1:1:1:1:1* is rendered as *2001:db8:0:1:1:1:1:1*.
+
+These methods can lead to very short representations for IPv6 addresses. For example, the localhost (loopback) address, *0:0:0:0:0:0:0:1*, and the IPv6 unspecified address, *0:0:0:0:0:0:0:0*, are reduced to *::1* and *::*, respectively.
+
+During the transition of the Internet from IPv4 to IPv6, it is typical to operate in a mixed addressing environment. For such use cases, a special notation has been introduced, which expresses IPv4-mapped and IPv4-compatible IPv6 addresses by writing the least-significant 32 bits of an address in the familiar IPv4 [dot-decimal notation](/wiki/Dot-decimal_notation "Dot-decimal notation"), whereas the 96 most-significant bits are written in IPv6 format. For example, the IPv4-mapped IPv6 address *::ffff:c000:0280* is written as *::ffff:192.0.2.128*, thus expressing clearly the original IPv4 address that was mapped to IPv6.
+
+### Networks
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=6 "Edit section: Networks")]
+An IPv6 network uses an address block that is a contiguous group of IPv6 addresses of a size that is a [power of two](/wiki/Power_of_two "Power of two"). The leading set of bits of the addresses are identical for all hosts in a given network, and are called the network's address or routing *prefix*.
+
+Network address ranges are written in [CIDR notation](/wiki/CIDR_notation "CIDR notation"). A network is denoted by the first address in the block (ending in all zeroes), a [slash](/wiki/Slash_(punctuation) "Slash (punctuation)") (/), and a [decimal](/wiki/Decimal "Decimal") value equal to the size in bits of the prefix. For example, the network written as *2001:db8:1234::/48* starts at address *2001:db8:1234:0000:0000:0000:0000:0000* and ends at *2001:db8:1234:ffff:ffff:ffff:ffff:ffff*.
+
+The routing prefix of an interface address may be directly indicated with the address using CIDR notation. For example, the configuration of an interface with address *2001:db8:a::123* connected to subnet *2001:db8:a::/64* is written as *2001:db8:a::123/64*.
+
+### Address block sizes
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=7 "Edit section: Address block sizes")]
+The size of a block of addresses is specified by writing a slash (/) followed by a number in decimal whose value is the length of the network prefix in bits. For example, an address block with 48 bits in the prefix is indicated by */48*. Such a block contains 2128 − 48 = 280 addresses. The smaller the length of the network prefix, the larger the block: a */21* block is 8 times larger than a */24* block.
+
+### Literal IPv6 addresses in network resource identifiers
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=8 "Edit section: Literal IPv6 addresses in network resource identifiers")]
+Colon (:) characters in IPv6 addresses may conflict with the established syntax of resource identifiers, such as [URIs](/wiki/Uniform_resource_identifier "Uniform resource identifier") and [URLs](/wiki/Uniform_Resource_Locator "Uniform Resource Locator"). The colon is conventionally used to terminate the host path before a [port number](/wiki/Port_number "Port number").[[10]](#cite_note-rfc3986-11) To alleviate this conflict, literal IPv6 addresses are enclosed in [square brackets](/wiki/Bracket "Bracket") in such resource identifiers, for example:
+
+http://[2001:db8:85a3:8d3:1319:8a2e:370:7348]/
+When the URL also contains a port number the notation is:
+
+https://[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443/
+where the trailing 443 is the example's port number.
+
+### Scoped literal IPv6 addresses (with zone index)
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=9 "Edit section: Scoped literal IPv6 addresses (with zone index)")]
+For addresses with other than global scope (as described in [§ Address scopes](#Address_scopes)), and in particular for link-local addresses, the choice of the network interface for sending a packet may depend on which zone the address belongs to. The same address may be valid in different zones, and in use by a different host in each of those zones. Even if a single address is not in use in different zones, the address prefixes for addresses in those zones may still be identical, which makes the operating system unable to select an outgoing interface based on the information in the [routing table](/wiki/Routing_table "Routing table") (which is prefix-based).
+
+In order to resolve the ambiguity in textual addresses, a *zone index* must be appended to the address. The zone index is separated from the address by a [percent sign](/wiki/Percent_sign "Percent sign") (%).[[11]](#cite_note-rfc4007-12) Although numeric zone indices must be universally supported, the zone index may also be an implementation-dependent string. The link-local address
+
+fe80::1ff:fe23:4567:890a
+could be expressed by
+
+fe80::1ff:fe23:4567:890a%eth2[[b]](#cite_note-13)
+or
+
+fe80::1ff:fe23:4567:890a%3
+The former (using an [interface](/wiki/Network_interface_controller "Network interface controller") name) is customary on most [Unix](/wiki/Unix "Unix")-like operating systems (e.g., [BSD](/wiki/BSD "BSD"), [Linux](/wiki/Linux "Linux"), [macOS](/wiki/MacOS "MacOS")).[[12]](#cite_note-FreeBSD-14)
+The latter (using an interface number) is the only syntax on [Microsoft Windows](/wiki/Microsoft_Windows "Microsoft Windows"), but as support for this syntax is mandatory per standard, it is also available on other operating systems.[[c]](#cite_note-15)
+
+BSD-based operating systems (including macOS) also support an alternative, non-standard syntax, where a numeric zone index is encoded in the second 16-bit word of the address. E.g.:
+
+fe80:3::1ff:fe23:4567:890a
+In all operating systems mentioned above, the zone index for link-local addresses actually refers to an interface, not to a zone. As multiple interfaces may belong to the same zone (e.g. when connected to the same network), in practice two addresses with different zone identifiers may actually be equivalent, and refer to the same host on the same link.[[d]](#cite_note-16)
+
+When used in [uniform resource identifiers](/wiki/Uniform_resource_identifier "Uniform resource identifier") (URI), the use of the percent sign causes a syntax conflict, therefore it must be escaped via [percent-encoding](/wiki/Percent-encoding "Percent-encoding"),[[13]](#cite_note-rfc6874-17) e.g.:
+
+http://[fe80::1ff:fe23:4567:890a%25eth0]/
+### Literal IPv6 addresses in UNC path names
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=10 "Edit section: Literal IPv6 addresses in UNC path names")]
+In [Microsoft Windows](/wiki/Microsoft_Windows "Microsoft Windows") operating systems, IPv4 addresses are valid location identifiers in [Uniform Naming Convention](/wiki/Uniform_Naming_Convention "Uniform Naming Convention") (UNC) path names. However, the colon is an illegal character in a UNC path name. Thus, the use of IPv6 addresses is also illegal in UNC names. For this reason, [Microsoft](/wiki/Microsoft "Microsoft") implemented a transcription algorithm to represent an IPv6 address in the form of a domain name that can be used in UNC paths. For this purpose, Microsoft registered and reserved the [second-level domain](/wiki/Second-level_domain "Second-level domain") *ipv6-literal.net* on the [Internet](/wiki/Internet "Internet") (although they gave up the domain in January 2014[[14]](#cite_note-18)). IPv6 addresses are transcribed as a hostname or subdomain name within this [namespace](/wiki/Namespace "Namespace"), in the following fashion:
+
+2001:db8:85a3:8d3:1319:8a2e:370:7348
+is written as
+
+2001-db8-85a3-8d3-1319-8a2e-370-7348.ipv6-literal.net
+This notation is automatically resolved locally by Microsoft software, without any queries to DNS name servers.
+
+If the IPv6 address contains a zone index, it is appended to the address portion after an 's' character:
+
+fe80::1ff:fe23:4567:890a%3
+is written as
+
+fe80--1ff-fe23-4567-890as3.ipv6-literal.net
+Address scopes
+--------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=11 "Edit section: Address scopes")]
+Every IPv6 address, except the unspecified address (*::*), has a *scope*,[[11]](#cite_note-rfc4007-12) which specifies in which part of the network it is valid.
+
+### Unicast
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=12 "Edit section: Unicast")]
+For [unicast](/wiki/Unicast "Unicast") addresses, two scopes are defined: link-local and global.
+
+Link-local addresses and the [loopback address](/wiki/Loopback_address "Loopback address") have *link-local* scope, which means they can only be used on a single directly attached network. All other addresses (including [unique local addresses](/wiki/Unique_local_address "Unique local address")) have *global* (or *universal*) scope, which means they are potentially globally routable and can be used to connect to addresses with *global* scope anywhere, or to addresses with *link-local* scope on the directly attached network.
+
+[Unique local addresses](/wiki/Unique_local_address "Unique local address") have global scope, but they are not globally administered. As a result, only other hosts in the same administrative domain (e.g., an organization), or within a cooperating administrative domain are able to reach such addresses, if properly routed. As their scope is global, these addresses are valid as a source address when communicating with any other global-scope address, even though it may be impossible to route packets from the destination back to the source.
+
+### Anycast
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=13 "Edit section: Anycast")]
+[Anycast](/wiki/Anycast "Anycast") addresses are syntactically identical to and indistinguishable from unicast addresses. Their only difference is administrative. Scopes for anycast addresses are therefore the same as for unicast addresses.
+
+### Multicast
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=14 "Edit section: Multicast")]
+For [multicast](/wiki/Multicast "Multicast") addresses, the four least-significant bits of the second address octet (*ff0s::*) identify the address scope, i.e. the domain in which the multicast packet should be propagated. Predefined and reserved scopes are:
+
+Scope values[[1]](#cite_note-rfc4291-1): 2.7
+
+| Value | Scope name | Notes |
+| --- | --- | --- |
+| 0x0 | *reserved* |  |
+| 0x1 | interface-local | Interface-local scope spans only a single interface on a node, and is useful only for loopback transmission of multicast. |
+| 0x2 | link-local | Link-local scope spans the same topological region as the corresponding unicast scope. |
+| 0x3 | realm-local | Realm-local scope is defined as larger than link-local, automatically determined by network topology and must not be larger than the following scopes.[[15]](#cite_note-rfc7346-19) |
+| 0x4 | admin-local | Admin-local scope is the smallest scope that must be administratively configured, i.e., not automatically derived from physical connectivity or other, non-multicast-related configuration. |
+| 0x5 | site-local | Site-local scope is intended to span a single site belonging to an organisation. |
+| 0x8 | organization-local | Organization-local scope is intended to span all sites belonging to a single organization. |
+| 0xe | global | Global scope spans all reachable nodes on the Internet – it is unbounded. |
+| 0xf | *reserved* |  |
+
+All other scopes are unassigned and available to administrators for defining additional regions.
+
+Address space
+-------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=15 "Edit section: Address space")]
+### General allocation
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=16 "Edit section: General allocation")]
+The management of IPv6 address allocation process is delegated to the [Internet Assigned Numbers Authority](/wiki/Internet_Assigned_Numbers_Authority "Internet Assigned Numbers Authority") (IANA)[[16]](#cite_note-rfc1881-20) by the [Internet Architecture Board](/wiki/Internet_Architecture_Board "Internet Architecture Board") and the [Internet Engineering Steering Group](/wiki/Internet_Engineering_Steering_Group "Internet Engineering Steering Group"). Its main function is the assignment of large address blocks to the [regional Internet registries](/wiki/Regional_Internet_registry "Regional Internet registry") (RIRs), which have the delegated task of allocation to network service providers and other local registries. The IANA has maintained the official list of allocations of the IPv6 address space since December 1995.[[17]](#cite_note-21)
+
+In order to allow efficient [route aggregation](/wiki/Route_aggregation "Route aggregation"), thereby reducing the size of the Internet routing tables, only one-eighth of the total address space (*2000::/3*) is currently allocated for use on the [Internet](/wiki/Internet "Internet"). The rest of the IPv6 address space is reserved for future use or for special purposes. The address space is assigned to the RIRs in blocks of */23* up to */12*.[[18]](#cite_note-22)
+
+The RIRs assign smaller blocks to [local Internet registries](/wiki/Local_Internet_registries "Local Internet registries") that distribute them to users. These are typically in sizes from */19* to */32*.[[19]](#cite_note-23)[[20]](#cite_note-24)[[21]](#cite_note-25) Global unicast assignment records can be found at the various RIRs or other websites.[[22]](#cite_note-26)
+
+The addresses are then typically distributed in */48* to */56* sized blocks to the end users.[[23]](#cite_note-rfc6177-27) IPv6 addresses are assigned to organizations in much larger blocks as compared to IPv4 address assignments—the recommended allocation is a */48* block which contains 280 addresses, being 248 or about 2.8×1014 times larger than the entire IPv4 address space of 232 addresses and about 7.2×1016 times larger than the */8* blocks of IPv4 addresses, which are the largest allocations of IPv4 addresses. The total pool, however, is sufficient for the foreseeable future, because there are 2128 (exactly 340,282,366,920,938,463,463,374,607,431,768,211,456) or about 3.4×1038 (340 [undecillion](/wiki/Names_of_large_numbers "Names of large numbers")) unique IPv6 addresses.
+
+Each RIR can divide each of its multiple */23* blocks into 512 */32* blocks, typically one for each ISP; an ISP can divide its */32* block into 65536 */48* blocks, typically one for each customer;[[24]](#cite_note-28) customers can create 65536 */64* networks from their assigned */48* block, each having 264 (18,446,744,073,709,551,616) addresses. In contrast, the entire IPv4 address space has only 232 (exactly 4,294,967,296 or about 4.3×109) addresses.
+
+By design, only a small fraction of the address space will be used actively. The large address space ensures that addresses are almost always available, which makes the use of [network address translation](/wiki/Network_address_translation "Network address translation") (NAT) for the purposes of address conservation unnecessary. NAT has been increasingly used for IPv4 networks to help alleviate [IPv4 address exhaustion](/wiki/IPv4_address_exhaustion "IPv4 address exhaustion").
+
+### Special allocation
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=17 "Edit section: Special allocation")]
+[Provider-independent address space](/wiki/Provider-independent_address_space "Provider-independent address space") is assigned directly to the end user by the RIRs from the special range *2001:678::/29* and allows customers to make provider changes without renumbering their networks.
+
+[Internet exchange points](/wiki/Internet_exchange_point "Internet exchange point") (IXPs) are assigned special addresses from the ranges *2001:7f8::/32*, *2001:504::/30*, and *2001:7fa::/32*[[25]](#cite_note-29) for communication with their connected [ISPs](/wiki/ISP "ISP").
+
+[Root name servers](/wiki/Root_name_server "Root name server") have been assigned addresses from the range *2001:7f8::/29*.[[26]](#cite_note-30)
+
+### Reserved anycast addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=18 "Edit section: Reserved anycast addresses")]
+The lowest address within each subnet prefix (the interface identifier set to all zeroes) is reserved as the *subnet-router* anycast address.[[1]](#cite_note-rfc4291-1) Applications may use this address when talking to any one of the available routers, as packets sent to this address are delivered to just one router.
+
+The 128 highest addresses within each */64* subnet prefix are reserved to be used as anycast addresses.[[27]](#cite_note-rfc2526-31) These addresses usually have the first 57 bits of the interface identifier set to 1, followed by the 7-bit anycast ID. Prefixes for the network can be of any length for routing purposes, but subnets are required to have a length of 64 bits. The address with value 0x7e in the 7 least-significant bits is defined as a [mobile IPv6](/wiki/Mobile_IPv6 "Mobile IPv6") home agents anycast address. The address with value 0x7f (all bits 1) is reserved and may not be used. No more assignments from this range have been made, so all the remaining values, 0x00 through 0x7d, are reserved as well.
+
+Special addresses
+-----------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=19 "Edit section: Special addresses")]
+See also: [Reserved IP addresses § IPv6](/wiki/Reserved_IP_addresses#IPv6 "Reserved IP addresses")
+There are a number of addresses with special meaning in IPv6.[[28]](#cite_note-rfc6890-32) They represent less than 2% of the entire address space:
+
+Special address blocks
+
+| Address block (CIDR) | First address | Last address | Number of addresses | Usage | Purpose |
+| --- | --- | --- | --- | --- | --- |
+| ::/128 | :: | :: | 1 | Software | Unspecified address |
+| ::1/128 | ::1 | ::1 | 1 | Host | [Loopback address](/wiki/Loopback_address "Loopback address")—a virtual interface that loops all traffic back to itself, the *local host* |
+| ::ffff:0:0/96 | ::ffff:0.0.0.0 ::ffff:0:0 | ::ffff:255.255.255.255 ::ffff:ffff:ffff | 232 | Software | IPv4-mapped addresses |
+| ::ffff:0:0:0/96 | ::ffff:0:0.0.0.0 ::ffff:0:0:0 | ::ffff:0:255.255.255.255 ::ffff:0:ffff:ffff | 232 | Software | IPv4-translated addresses |
+| 64:ff9b::/96 | 64:ff9b::0.0.0.0 64:ff9b::0:0 | 64:ff9b::255.255.255.255 64:ff9b::ffff:ffff | 232 | The global Internet | IPv4/IPv6 translation[[29]](#cite_note-rfc6052-33) |
+| 64:ff9b:1::/48 | 64:ff9b:1:: | 64:ff9b:1:ffff:ffff:ffff:ffff:ffff | 280, with 248 for each IPv4 | Private internets | IPv4/IPv6 translation[[30]](#cite_note-rfc8215-34) |
+| 100::/64 | 100:: | 100::ffff:ffff:ffff:ffff | 264 | Routing | Discard prefix[[31]](#cite_note-rfc6666-35) |
+| 2001::/32 | 2001:: | 2001:0:ffff:ffff:ffff:ffff:ffff:ffff | 296 | The global Internet | [Teredo tunneling](/wiki/Teredo_tunneling "Teredo tunneling")[[32]](#cite_note-rfc4680-36) |
+| 2001:20::/28 | 2001:20:: | 2001:2f:ffff:ffff:ffff:ffff:ffff:ffff | 2100 | Software | [ORCHIDv2](/w/index.php?title=ORCHIDv2&action=edit&redlink=1 "ORCHIDv2 (page does not exist)")[[33]](#cite_note-rfc7343-37) |
+| 2001:db8::/32 | 2001:db8:: | 2001:db8:ffff:ffff:ffff:ffff:ffff:ffff | 296 | Documentation | Addresses used in documentation and example source code[[34]](#cite_note-rfc3849-38) |
+| 2002::/16 | 2002:: | 2002:ffff:ffff:ffff:ffff:ffff:ffff:ffff | 2112 | The global Internet | The [6to4](/wiki/6to4 "6to4") addressing scheme (deprecated)[[35]](#cite_note-rfc7526-39) |
+| 5f00::/16 | 5f00:: | 5f00:ffff:ffff:ffff:ffff:ffff:ffff:ffff | 2112 | Routing | IPv6 [Segment Routing](/wiki/Segment_Routing "Segment Routing") (SRv6)[[36]](#cite_note-draft-ietf-6man-sids-06-40) |
+| fc00::/7 | fc00:: | fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff | 2121 | Private internets | [Unique local address](/wiki/Unique_local_address "Unique local address")[[37]](#cite_note-rfc4193-41) |
+| fe80::/64 from fe80::/10 | fe80:: | fe80::ffff:ffff:ffff:ffff | 264 | Link | [Link-local address](/wiki/Link-local_address#IPv6 "Link-local address") |
+| ff00::/8 | ff00:: | ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff | 2120 | The global Internet | [Multicast address](/wiki/Multicast_address#IPv6 "Multicast address") |
+
+### Unicast addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=20 "Edit section: Unicast addresses")]
+#### Unspecified address
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=21 "Edit section: Unspecified address")]
+* *::/128* – The address with all zero bits is called the *unspecified address* (corresponding to *0.0.0.0/32* in IPv4). This address must never be assigned to an interface and is to be used only in software before the application has learned its host's source address appropriate for a pending connection. Routers must not forward packets with the unspecified address.
+
+Applications may listen on one or more specific interfaces for incoming connections, which are shown in listings of active internet connections by a specific IP address (and a port number, separated by a colon). When the unspecified address is shown it means that an application is listening for incoming connections on all available interfaces. 
+
+In routing table configuration, the unspecified address may be used to represent the [default route](/wiki/Default_route "Default route") address (corresponding to *0.0.0.0/0* in IPv4) for destination addresses (unicast, multicast and others) not specified elsewhere in a routing table.
+
+#### Local addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=22 "Edit section: Local addresses")]
+* *::1/128* – The [loopback](/wiki/Loopback "Loopback") address is a unicast [localhost](/wiki/Localhost "Localhost") address. This address corresponds to *[127.0.0.1](/wiki/Localhost "Localhost")/8* in IPv4.  
+If an application in a host sends packets to this address, the IPv6 stack loops these packets back on the same virtual interface.
+* *fe80::/10* – Addresses in the link-local prefix are only valid and unique on the local subnet. This address range is comparable to the auto-configuration addresses *169.254.0.0/16* of IPv4.  
+Within this prefix only one */64* subnet is allocated (there are 54 zero bits), yielding an effective format of *fe80::/64*. The least significant 64 bits were previously chosen as the interface hardware address constructed in [modified EUI-64](#Modified_EUI-64) format, but are now pseudo-random values for privacy. A [link-local address](/wiki/Link-local_address#IPv6 "Link-local address") is required on every IPv6-enabled interface and applications may rely on the existence of a link-local address even when there is no IPv6 routing.
+
+#### Unique local addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=23 "Edit section: Unique local addresses")]
+* *fc00::/7* — [Unique local addresses](/wiki/Unique_local_address "Unique local address") (ULAs) are intended for local communication[[37]](#cite_note-rfc4193-41) (comparable to [IPv4 private addresses](/wiki/Private_network "Private network") *10.0.0.0/8*, *172.16.0.0/12* and *192.168.0.0/16*).  
+They are routable only within a set of cooperating sites. The block is split into two halves. The lower half of the block (*fc00::/8*) was intended for globally allocated prefixes, but an allocation method has yet to be defined. The upper half (*fd00::/8*) is used for *probabilistically unique* addresses in which the */8* prefix is combined with a 40-bit locally generated [pseudorandom](/wiki/Pseudorandom "Pseudorandom") number to obtain a */48* private prefix. The procedure for selecting a 40-bit number results in only a negligible chance that two sites that wish to merge or communicate encounter address collisions, but can use the same */48* prefix.[[37]](#cite_note-rfc4193-41)
+
+#### Transition from IPv4
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=24 "Edit section: Transition from IPv4")]
+* *::ffff:0:0/96* — This prefix is used for [IPv6 transition mechanisms](/wiki/IPv6_transition_mechanisms "IPv6 transition mechanisms") and designated as an *IPv4-mapped IPv6 address*.  
+With a few exceptions, this address type allows the transparent use of the [transport layer](/wiki/Transport_layer "Transport layer") protocols over IPv4 through the IPv6 networking [application programming interface](/wiki/Application_programming_interface "Application programming interface"). In this [dual-stack](/wiki/Dual-stack "Dual-stack") configuration, server applications only need to open a single listening [socket](/wiki/Network_socket "Network socket") to handle connections from clients using IPv6 or IPv4 protocols. IPv6 clients are handled natively by default, and IPv4 clients appear as IPv6 clients at their IPv4-mapped IPv6 address. Transmission is handled similarly; established sockets may be used to transmit IPv4 or IPv6 datagram, based on the binding to an IPv6 address, or an IPv4-mapped address.
+* *::ffff:0:0:0/96* — A prefix used for *IPv4-translated addresses*. These are used by the [Stateless IP/ICMP Translation (SIIT)](/wiki/IPv6_transition_mechanism#Stateless_IP/ICMP_Translation "IPv6 transition mechanism") protocol.[[38]](#cite_note-rfc7915-42)
+* *64:ff9b::/96* — The *well-known prefix*. Addresses with this prefix are used for automatic IPv4/IPv6 translation.[[29]](#cite_note-rfc6052-33)
+* *64:ff9b:1::/48* — A prefix for locally translated IPv4/IPv6 addresses. Addresses with this prefix can be used for multiple IPv4/IPv6 translation mechanisms like [NAT64](/wiki/NAT64 "NAT64") and [SIIT](/wiki/IPv6_transition_mechanism#Stateless_IP/ICMP_Translation "IPv6 transition mechanism").[[30]](#cite_note-rfc8215-34) It is defined in RFC 8215 and compared to *64:ff9b::/96* it contains the IPv4 address in position 48-63 and 72-87 (see RFC6052). This means that for every IPv4 address a /88 IPv6 prefix is assigned to the device. This enables similar use cases as 6to4, where a single public IPv4 address gets translated into a prefix. This way only one level of NAT is required and the devices do not need to do NAT66 internally if they need additional addresses e.g. for P2P interfaces or docker containers.
+* *2002::/16* — This prefix was used for [6to4](/wiki/6to4 "6to4") addressing (prefix from the IPv4 network, *192.88.99.0/24*, was also used).  
+The 6to4 addressing scheme is deprecated.[[35]](#cite_note-rfc7526-39)
+
+#### Special-purpose addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=25 "Edit section: Special-purpose addresses")]
+IANA has reserved a so-called *Sub-TLA ID* address block for special assignments[[28]](#cite_note-rfc6890-32)[[39]](#cite_note-rfc2928-43) of *2001::/23* (split into the range of 64 network prefixes *2001:0000::/29* through *2001:01f8::/29*). Three assignments from this block are currently allocated:
+
+* *2001::/32* — Used for [Teredo tunneling](/wiki/Teredo_tunneling "Teredo tunneling"), an [IPv6 transition mechanism](/wiki/IPv6_transition_mechanism "IPv6 transition mechanism").
+* *2001:2::/48* — Used for [benchmarking](/wiki/Benchmark_(computing) "Benchmark (computing)") IPv6. Corresponds with *198.18.0.0/15* used for benchmarking IPv4. Assigned to the Benchmarking Methodology Working Group (BMWG).[[40]](#cite_note-rfc5180-44)
+* *2001:20::/28* — Overlay Routable Cryptographic Hash Identifiers (ORCHIDv2).[[33]](#cite_note-rfc7343-37) These are non-routed IPv6 addresses used for Cryptographic Hash Identifiers.
+
+#### Documentation
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=26 "Edit section: Documentation")]
+* *2001:db8::/32* — This prefix is used in documentation[[34]](#cite_note-rfc3849-38)[[e]](#cite_note-46) The addresses should be used anywhere an example IPv6 address is given or model networking scenarios are described.
+
+#### Discard
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=27 "Edit section: Discard")]
+* *100::/64* — This prefix is used for discarding traffic.[[31]](#cite_note-rfc6666-35)
+
+#### Deprecated and obsolete
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=28 "Edit section: Deprecated and obsolete")]
+See [§ Deprecated and obsolete addresses](#Deprecated_and_obsolete_addresses)
+
+### Multicast addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=29 "Edit section: Multicast addresses")]
+The multicast addresses *ff0x::*, where *x* is any hexadecimal value, are reserved[[1]](#cite_note-rfc4291-1) and managed by the [Internet Assigned Numbers Authority](/wiki/Internet_Assigned_Numbers_Authority "Internet Assigned Numbers Authority") (IANA).[[42]](#cite_note-47)
+
+Common IPv6 multicast addresses
+
+| Address | Description | Available scopes |
+| --- | --- | --- |
+| *ff0x::1* | All nodes address, identify the group of all IPv6 nodes | Available in scope 1 (interface-local) and 2 (link-local): * *ff01::1* → All nodes in the interface-local * *ff02::1* → All nodes in the link-local |
+| *ff0x::2* | All routers | Available in scope 1 (interface-local), 2 (link-local) and 5 (site-local): * *ff01::2* → All routers in the interface-local * *ff02::2* → All routers in the link-local * *ff05::2* → All routers in the site-local |
+| *ff02::5* | [OSPFIGP](/wiki/Open_Shortest_Path_First "Open Shortest Path First") | 2 (link-local) |
+| *ff02::6* | [OSPFIGP](/wiki/Open_Shortest_Path_First "Open Shortest Path First") designated routers | 2 (link-local) |
+| *ff02::9* | [RIP](/wiki/Routing_Information_Protocol "Routing Information Protocol") routers | 2 (link-local) |
+| *ff02::a* | [EIGRP](/wiki/Enhanced_Interior_Gateway_Routing_Protocol "Enhanced Interior Gateway Routing Protocol") routers | 2 (link-local) |
+| *ff02::c* | [Web Services Dynamic Discovery](/wiki/WS-Discovery "WS-Discovery") | 2 (link-local) |
+| *ff02::d* | All [PIM](/wiki/Protocol_Independent_Multicast "Protocol Independent Multicast") routers | 2 (link-local) |
+| *ff02::1a* | All [RPL](/wiki/IPv6_Routing_Protocol_for_Low-Power_and_Lossy_Networks "IPv6 Routing Protocol for Low-Power and Lossy Networks") routers | 2 (link-local) |
+| *ff0x::fb* | [mDNSv6](/wiki/Multicast_DNS "Multicast DNS") | Available in all scopes |
+| *ff0x::101* | All [NTP](/wiki/Network_Time_Protocol "Network Time Protocol") servers | Available in all scopes |
+| *ff02::1:1* | Link name | 2 (link-local) |
+| *ff02::1:2* | All-dhcp-agents ([DHCPv6](/wiki/DHCPv6 "DHCPv6")) | 2 (link-local) |
+| *ff02::1:3* | Link-local multicast name resolution | 2 (link-local) |
+| *ff05::1:3* | All-dhcp-servers ([DHCPv6](/wiki/DHCPv6 "DHCPv6")) | 5 (site-local) |
+| *ff02::1:ff00:0/104* | [Solicited-node multicast address](/wiki/Solicited-node_multicast_address "Solicited-node multicast address") (see below) | 2 (link-local) |
+| *ff02::2:ff00:0/104* | Node information queries | 2 (link-local) |
+
+#### Solicited-node multicast address
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=30 "Edit section: Solicited-node multicast address")]
+The least significant 24 bits of the [solicited-node multicast address](/wiki/Solicited-node_multicast_address "Solicited-node multicast address") group ID are filled with the least significant 24 bits of the interface's unicast or anycast address. These addresses allow link-layer address resolution via [Neighbor Discovery Protocol](/wiki/Neighbor_Discovery_Protocol "Neighbor Discovery Protocol") (NDP) on the link without disturbing all nodes on the local network. A host is required to join a solicited-node multicast group for each of its configured unicast or anycast addresses.
+
+Stateless address autoconfiguration (SLAAC)
+-------------------------------------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=31 "Edit section: Stateless address autoconfiguration (SLAAC)")]
+On system startup, a node automatically creates a [link-local address](/wiki/Link-local_address "Link-local address") on each IPv6-enabled interface, even if globally routable addresses are manually configured or obtained through *configuration protocols* (see below). It does so independently and without any prior configuration by stateless address autoconfiguration (SLAAC),[[43]](#cite_note-rfc4862-48) using a component of the [Neighbor Discovery Protocol](/wiki/Neighbor_Discovery_Protocol "Neighbor Discovery Protocol"). This address is selected with the prefix *fe80::/64*.
+
+In IPv4, typical *configuration protocols* include DHCP or PPP. Although [DHCPv6](/wiki/DHCPv6 "DHCPv6") exists, IPv6 hosts normally use the [Neighbor Discovery Protocol](/wiki/Neighbor_Discovery_Protocol "Neighbor Discovery Protocol") to create a globally routable unicast address: the host sends router solicitation requests and an IPv6 [router](/wiki/Router_(computing) "Router (computing)") responds with a prefix assignment.[[44]](#cite_note-rfc4861-49)
+
+### Interface identifier
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=32 "Edit section: Interface identifier")]
+The lower 64 bits of these addresses are populated with a 64-bit interface identifier. This should be a pseudo-random number for privacy reasons. Also for privacy reasons, the interface identifier is different for each automatically configured address of that interface. This has the disadvantage that multiple [multicast](/wiki/Multicast "Multicast") groups need to be joined for neighbor discovery. For this, the solicited-node multicast address is used, formed from the network prefix *ff02::1:ff00:0/104* and the 24 least significant bits of the address.
+
+A 64-bit interface identifier can be derived from the interface's 48-bit [MAC address](/wiki/MAC_address "MAC address"), although [stable privacy addresses](#Stable_privacy_addresses) are now recommended as a default instead.[[2]](#cite_note-rfc8064-2) A MAC address *00-0C-29-0C-47-D5* is turned into a 64-bit [EUI-64](/wiki/EUI-64 "EUI-64") by inserting *FF-FE* in the middle: *00-0C-29-FF-FE-0C-47-D5*.[[f]](#cite_note-50)
+
+### Duplicate address detection
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=33 "Edit section: Duplicate address detection")]
+The assignment of a [unicast](/wiki/Unicast "Unicast") IPv6 address to an interface involves an internal test for the uniqueness of that address using *Neighbor Solicitation* and *Neighbor Advertisement* ([ICMPv6](/wiki/ICMPv6 "ICMPv6") type 135 and 136) messages. While in the process of establishing uniqueness an address has a *tentative* state.
+
+The node joins the *solicited-node* multicast address for the tentative address and sends neighbor solicitations, with the tentative address as the target address and the unspecified address (*::/128*) as its source address. The node also joins the all-hosts multicast address *ff02::1*, so it can receive *Neighbor Advertisements*.
+
+If a node receives a neighbor solicitation with its own tentative address as the target address, then it knows its address is not unique. The same is true if the node receives a neighbor advertisement with the tentative address as the source of the advertisement. Only after having successfully established that an address is unique may it be assigned and used by an interface.
+
+When an [anycast](/wiki/Anycast "Anycast") address is assigned to an interface (e.g. a subnet-router anycast address), due to the inherent non-uniqueness of this type of address, duplicate address detection is not performed.
+
+### Address lifetime
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=34 "Edit section: Address lifetime")]
+Each IPv6 address that is bound to an interface has a defined lifetime. Lifetimes are infinite, unless configured to a shorter period. There are two lifetimes that govern the state of an address: the *preferred lifetime* and the *valid lifetime*.[[45]](#cite_note-51) Lifetimes can be configured in [routers](/wiki/Router_(computing) "Router (computing)") that provide the values used for autoconfiguration, or specified when manually configuring addresses on interfaces.
+
+When an address is assigned to an interface it gets the status *preferred*, which it holds during its preferred-lifetime. After that lifetime expires the status becomes *deprecated* and no new connections should be made using this address.[[g]](#cite_note-52) The address becomes *invalid* after its valid-lifetime also expires; the address is removed from the interface and may be assigned somewhere else on the [Internet](/wiki/Internet "Internet").
+
+### Temporary addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=35 "Edit section: Temporary addresses")]
+The globally unique and static MAC addresses used by stateless address autoconfiguration to create interface identifiers offer an opportunity to track user equipment across time and IPv6 network prefix changes.[[46]](#cite_note-53) To reduce the prospect of a user identity being permanently tied to an IPv6 address portion, a node may create temporary addresses with interface identifiers based on time-varying random bit strings[[47]](#cite_note-rfc8981-54) and relatively short lifetimes (hours to days), after which they are replaced with new addresses.
+
+Temporary addresses may be used as source addresses for originating connections, while external hosts use a public address by querying the [Domain Name System](/wiki/Domain_Name_System "Domain Name System") (DNS).
+
+Network interfaces configured for IPv6 use temporary addresses by default in [OS X Lion](/wiki/Mac_OS_X_Lion "Mac OS X Lion") and later Apple systems[*[citation needed](/wiki/Wikipedia:Citation_needed "Wikipedia:Citation needed")*] as well as in [Windows Vista](/wiki/Windows_Vista "Windows Vista"), [Windows 2008 Server](/wiki/Windows_2008_Server "Windows 2008 Server") and later Microsoft systems.[[48]](#cite_note-55)
+
+### Cryptographically generated addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=36 "Edit section: Cryptographically generated addresses")]
+As a means to enhance security for [Neighbor Discovery Protocol](/wiki/Neighbor_Discovery_Protocol "Neighbor Discovery Protocol") *cryptographically generated addresses* (CGAs) were introduced in 2005[[49]](#cite_note-rfc3972-56) as part of the [Secure Neighbor Discovery](/wiki/Secure_Neighbor_Discovery "Secure Neighbor Discovery") (SEND) protocol.
+
+Such an address is generated using two [hash functions](/wiki/Hash_function "Hash function") that take several inputs. The first uses a public key and a random modifier; the latter being incremented repeatedly until a specific amount of zero bits of the resulting hash is acquired.[[h]](#cite_note-57) The second hash function takes the network prefix and the previous hash value. The least significant 64 bits of the second hash result is appended to the 64-bit network prefix to form a 128-bit address.
+
+The hash functions can also be used to verify if a specific IPv6 address satisfies the requirement of being a valid CGA. This way, communication can be set up between trusted addresses exclusively.
+
+### Stable privacy addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=37 "Edit section: Stable privacy addresses")]
+The use of the [modified EUI-64](#Modified_EUI-64) format has serious implications for security and privacy concerns,[[50]](#cite_note-rfc7217-58) because the underlying hardware address (most typically the [MAC address](/wiki/MAC_address "MAC address")) is exposed beyond the local network, permitting the tracking of user activities and correlation of user accounts to other information. It also permits vendor-specific attack strategies and reduces the size of the address space for searching for attack targets.
+
+Stable privacy addresses were introduced to remedy these shortcomings. They are stable within a specific network but change when moving to another, to improve privacy. They are chosen deterministically, but randomly, in the entire address space of the network.
+
+Generation of a stable privacy address is based on a hash function that uses several stable parameters. It is implementation specific, but it is recommended to include at least the network prefix, the name of the network interface, a duplicate address counter, and a secret key. The resulting hash value is used to construct the final address: Typically the 64 least significant bits are concatenated to the 64-bit network prefix, to yield a 128-bit address. If the network prefix is smaller than 64 bits, more bits of the hash are used. If the resulting address does not conflict with existing or reserved addresses, it is assigned to the interface. Conflicts are resolved by adjusting the duplicate address counter.[[50]](#cite_note-rfc7217-58)
+
+Default address selection
+-------------------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=38 "Edit section: Default address selection")]
+IPv6-enabled network interfaces usually have more than one IPv6 address, for example, a link-local and a global address. They may also have temporary addresses that change after a certain lifetime has expired. IPv6 introduces the concepts of address scope and selection preference, yielding multiple choices for source and destination addresses in communication with another host.
+
+The preference selection algorithm selects the most appropriate address to use in communications with a particular destination, including the use of IPv4-mapped addresses in [dual-stack](/wiki/Dual-stack "Dual-stack") implementations.[[51]](#cite_note-rfc6724-59) It uses a configurable preference table that associates each routing prefix with a precedence level. The default table has the following content:
+
+| Prefix | Precedence | Label | Usage |
+| --- | --- | --- | --- |
+| ::1/128 | 50 | 0 | Localhost |
+| ::/0 | 40 | 1 | Default unicast |
+| ::ffff:0:0/96 | 35 | 4 | IPv4-mapped IPv6 address |
+| 2002::/16 | 30 | 2 | 6to4 |
+| 2001::/32 | 5 | 5 | Teredo tunneling |
+| fc00::/7 | 3 | 13 | Unique local address |
+| ::/96 | 1 | 3 | IPv4-compatible addresses (deprecated) |
+| fec0::/10 | 1 | 11 | Site-local address (deprecated) |
+| 3ffe::/16 | 1 | 12 | 6bone (returned) |
+
+The default configuration places preference on IPv6 usage, and selects destination addresses within the smallest possible scope, so that link-local communication is preferred over globally routed paths when otherwise equally suitable. The prefix policy table is similar to a routing table, with the precedence value serving as the role of a link cost, where higher preference is expressed as a larger value. Source addresses are preferred to have the same label value as the destination address. Addresses are matched to prefixes based on the longest-matching most-significant bit sequence. Candidate source addresses are obtained from the [operating system](/wiki/Operating_system "Operating system") and candidate destination addresses may be queried via DNS.
+
+To minimize the time to establish a connection when multiple addresses are available for communication, the [Happy Eyeballs](/wiki/Happy_Eyeballs "Happy Eyeballs") algorithm was devised. It queries DNS for IPv6 and IPv4 addresses of the target host, sorts candidate addresses using the default address selection table, and tries to establish connections in parallel. The first established connection aborts current and future attempts to connect to other addresses.
+
+Domain Name System
+------------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=39 "Edit section: Domain Name System")]
+In the [Domain Name System](/wiki/Domain_Name_System "Domain Name System"), [hostnames](/wiki/Hostname "Hostname") are mapped to IPv6 addresses by *AAAA* resource records, so-called *quad-A* records.[[52]](#cite_note-rfc3596-60)
+For [reverse lookup](/wiki/Reverse_DNS_lookup "Reverse DNS lookup") the IETF reserved the domain [ip6.arpa](/wiki/.arpa ".arpa"), where the name space is hierarchically divided by the 1-digit [hexadecimal](/wiki/Hexadecimal "Hexadecimal") representation of [nibble](/wiki/Nibble "Nibble") units (4 bits) of the IPv6 address.
+
+As in IPv4, each host is represented in the DNS by two DNS records: an address record and a reverse mapping pointer record. For example,
+a host computer named *derrick* in zone *example.com* has the [unique local address](/wiki/Unique_local_address "Unique local address") *fdda:5cc1:23:4::1f*. Its quad-A address record is
+
+```
+ derrick.example.com.  IN  AAAA  fdda:5cc1:23:4::1f
+
+```
+
+and its IPv6 pointer record is
+
+```
+ f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.0.0.3.2.0.0.1.c.c.5.a.d.d.f.ip6.arpa.  IN  PTR   derrick.example.com.
+
+```
+
+This pointer record may be defined in a number of zones, depending on the chain of delegation of authority in the zone d.f.ip6.arpa.
+
+The DNS protocol is independent of its [transport layer](/wiki/Transport_layer "Transport layer") protocol. Queries and replies may be transmitted over IPv6 or IPv4 transports regardless of the address family of the data requested.
+
+AAAA record fields
+
+| NAME | Domain name |
+| --- | --- |
+| TYPE | AAAA (28) |
+| CLASS | Internet (1) |
+| [TTL](/wiki/Time_to_live "Time to live") | Time to live, in seconds |
+| RDLENGTH | Length of RDATA field |
+| RDATA | 128-bit IPv6 address, network byte order |
+
+Historical notes
+----------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=40 "Edit section: Historical notes")]
+### Deprecated and obsolete addresses
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=41 "Edit section: Deprecated and obsolete addresses")]
+* The site-local prefix *fec0::/10* specifies that the address is valid only within the site network of an organization. It was part of the original addressing architecture[[53]](#cite_note-rfc1884-61) in December 1995, but its use was deprecated in September 2004[[54]](#cite_note-rfc3879-62) because the definition of the term *site* was ambiguous, which led to confusing routing rules. New networks must not support this special type of address. In October 2005, a new specification[[37]](#cite_note-rfc4193-41) replaced this address type with [unique local addresses](/wiki/Unique_local_address "Unique local address").
+* The address block *200::/7* was defined as an OSI NSAP-mapped prefix set in August 1996,[[55]](#cite_note-rfc4147-63)[[56]](#cite_note-rfc1888-64) but was deprecated in December 2004.[[57]](#cite_note-rfc4048-65)
+* The 96-bit zero-value prefix *::/96*, originally known as *IPv4-compatible addresses*, was mentioned in 1995[[53]](#cite_note-rfc1884-61) but never fully described. This range of addresses was used to represent [IPv4](/wiki/IPv4 "IPv4") addresses within an IPv6 transition technology. Such an IPv6 address has its first (most significant) 96 bits set to zero, while its last 32 bits are the IPv4 address that is represented. In February 2006, the [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") (IETF) deprecated the use of IPv4-compatible addresses.[[1]](#cite_note-rfc4291-1) The only remaining use of this address format is to represent an IPv4 address in a table or database with fixed size members that must also be able to store an IPv6 address.
+* Address block *3ffe::/16* was allocated for test purposes for the [6bone](/wiki/6bone "6bone") network in December 1998.[[58]](#cite_note-rfc2471-66) Prior to that, the address block *5f00::/8* was used for this purpose. Both address blocks were returned to the address pool in June 2006.[[59]](#cite_note-rfc3701-67)
+* Due to operational problems with [6to4](/wiki/6to4 "6to4") the use of address block *2002::/16* is diminishing, since the 6to4 mechanism is deprecated since May 2015.[[35]](#cite_note-rfc7526-39) Although IPv4 address block *192.88.99.0/24* is deprecated, *2002::/16* is not.
+* In April 2007 the address block *2001:10::/28* was assigned for Overlay Routable Cryptographic Hash Identifiers (ORCHID).[[60]](#cite_note-rfc4843-68) It was intended for experimental use. In September 2014 a second version of ORCHID was specified,[[33]](#cite_note-rfc7343-37) and with the introduction of block *2001:20::/28* the original block was returned to [IANA](/wiki/IANA "IANA").
+
+### Miscellaneous
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=42 "Edit section: Miscellaneous")]
+* For [reverse DNS lookup](/wiki/Reverse_DNS_lookup "Reverse DNS lookup"), IPv6 addresses were originally registered in the DNS zone *ip6.int*, because it was expected that the top-level domain [arpa](/wiki/.arpa ".arpa") would be retired. In 2000, the [Internet Architecture Board](/wiki/Internet_Architecture_Board "Internet Architecture Board") (IAB) reverted this intention, and decided in 2001 that arpa should retain its original function. Domains in ip6.int were moved to ip6.arpa[[61]](#cite_note-rfc3152-69) and zone ip6.int was officially removed on 6 June 2006.
+* In March 2011, the [IETF](/wiki/IETF "IETF") refined the recommendations for allocation of address blocks to end sites.[[23]](#cite_note-rfc6177-27) Instead of assigning either a */48*, */64*, or */128* (according to [IAB](/wiki/Internet_Architecture_Board "Internet Architecture Board")'s and [IESG](/wiki/IESG "IESG")'s views of 2001),[[62]](#cite_note-rfc3177-70) Internet service providers should consider assigning smaller blocks (for example a */56*) to end users. The [ARIN](/wiki/ARIN "ARIN"), [RIPE](/wiki/RIPE "RIPE") & [APNIC](/wiki/APNIC "APNIC") regional registries' policies encourage */56* assignments where appropriate.[[23]](#cite_note-rfc6177-27)
+* Originally, two proposals existed for translating domain names to IPv6 addresses: one using AAAA records,[[63]](#cite_note-rfc1886-71) the other using A6 records.[[64]](#cite_note-rfc2874-72) AAAA records, the method that prevailed, are comparable to A records for IPv4, providing a simple mapping from hostname to IPv6 address. The method using A6 records used a hierarchical scheme, in which the mapping of subsequent groups of address bits was specified by additional A6 records, providing the possibility to renumber all hosts in a network by changing a single A6 record. As the perceived benefits of the A6 format were not deemed to outweigh the perceived costs,[[65]](#cite_note-73)[[66]](#cite_note-rfc3363-74)[[67]](#cite_note-rfc3364-75)[[68]](#cite_note-rfc6536-76) the method was moved to experimental status in 2002,[[66]](#cite_note-rfc3363-74) and finally to historic status in 2012.[[68]](#cite_note-rfc6536-76)
+* In 2009, many DNS resolvers in home-networking NAT devices and routers were found to handle AAAA records improperly.[[69]](#cite_note-rfc4074-77) Some of these simply dropped DNS requests for such records, instead of properly returning the appropriate negative DNS response. Because the request is dropped, the host sending the request has to wait for a timeout to trigger. This often causes increased latency when connecting to dual-stack IPv6/IPv4 hosts, as the client software waits for the IPv6 connection to fail before trying IPv4. See also: [Happy Eyeballs](/wiki/Happy_Eyeballs "Happy Eyeballs")
+
+Notes
+-----
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=43 "Edit section: Notes")]
+
+1. **[^](#cite_ref-9)** A 16 bit or two [octet](/wiki/Octet_(computing) "Octet (computing)") quantity is sometimes also called a [hextet](/wiki/Hextet "Hextet").[[7]](#cite_note-Graziani2012-7)[[8]](#cite_note-Coffeen2014-8)
+2. **[^](#cite_ref-13)** Assuming that eth2 is equivalent to zone number 3. This is usually the case, as real zone numbers start at 1 (0 being the 'default zone')
+3. **[^](#cite_ref-15)** Although Windows supports the RFC 3493 `if_nametoindex()` API for converting a name to an interface number, it does not support the customary "name after %" extension.
+4. **[^](#cite_ref-16)** The now-removed [site-local addresses](/wiki/Site-local_address "Site-local address") of fec0::/10 also require a zone index.[[12]](#cite_note-FreeBSD-14)
+5. **[^](#cite_ref-46)** *192.0.2.0/24*, *198.51.100.0/24*, and *203.0.113.0/24* are used for documentation in IPv4.[[41]](#cite_note-rfc5737-45)
+6. **[^](#cite_ref-50)** When this EUI-64 is used to form an IPv6 address, it is modified:[[1]](#cite_note-rfc4291-1) the meaning of the *Universal/Local* bit (the 7th most significant bit of the EUI-64, starting from 1) is inverted, so that a 1 now means *Universal*. To create an IPv6 address with the network prefix *2001:db8:1:2::/64* it yields the address *2001:db8:1:2:020c:29ff:fe0c:47d5* (with the *Universal/Local* bit, the second-least-significant bit of the underlined quartet, inverted to 1 in this case because the MAC address is universally unique).
+7. **[^](#cite_ref-52)** In most cases, the lifetime does not expire because new Router Advertisements (RAs) refresh the timers. But if there are no more RAs, eventually the preferred lifetime elapses and the address becomes *deprecated*.
+8. **[^](#cite_ref-57)** Comparable with the 'proof of work' field in [Bitcoin](/wiki/Bitcoin "Bitcoin") mining.
+
+References
+----------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=44 "Edit section: References")]
+
+1. ^ [***a***](#cite_ref-rfc4291_1-0) [***b***](#cite_ref-rfc4291_1-1) [***c***](#cite_ref-rfc4291_1-2) [***d***](#cite_ref-rfc4291_1-3) [***e***](#cite_ref-rfc4291_1-4) [***f***](#cite_ref-rfc4291_1-5) [***g***](#cite_ref-rfc4291_1-6) [***h***](#cite_ref-rfc4291_1-7) [***i***](#cite_ref-rfc4291_1-8) R. Hinden; [S. Deering](/wiki/Steve_Deering "Steve Deering") (February 2006). [*IP Version 6 Addressing Architecture*](https://datatracker.ietf.org/doc/html/rfc4291). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4291](https://doi.org/10.17487%2FRFC4291). [RFC](/wiki/Request_for_Comments "Request for Comments") [4291](https://datatracker.ietf.org/doc/html/rfc4291). *Draft Standard.* Obsoletes RFC [3513](https://datatracker.ietf.org/doc/html/rfc3513). Updated by RFC [5952](https://datatracker.ietf.org/doc/html/rfc5952), [6052](https://datatracker.ietf.org/doc/html/rfc6052), [7136](https://datatracker.ietf.org/doc/html/rfc7136), [7346](https://datatracker.ietf.org/doc/html/rfc7346), [7371](https://datatracker.ietf.org/doc/html/rfc7371) and [8064](https://datatracker.ietf.org/doc/html/rfc8064).
+2. ^ [***a***](#cite_ref-rfc8064_2-0) [***b***](#cite_ref-rfc8064_2-1) F. Gont; A. Cooper; D. Thaler; W. Liu (February 2017). [*Recommendation on Stable IPv6 Interface Identifiers*](https://datatracker.ietf.org/doc/html/rfc8064). [IETF](/wiki/IETF "IETF"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC8064](https://doi.org/10.17487%2FRFC8064). [RFC](/wiki/Request_for_Comments "Request for Comments") [8064](https://datatracker.ietf.org/doc/html/rfc8064). *Proposed Standard.* Updates RFC [2464](https://datatracker.ietf.org/doc/html/rfc2464), [2467](https://datatracker.ietf.org/doc/html/rfc2467), [2470](https://datatracker.ietf.org/doc/html/rfc2470), [2491](https://datatracker.ietf.org/doc/html/rfc2491), [2492](https://datatracker.ietf.org/doc/html/rfc2492), [2497](https://datatracker.ietf.org/doc/html/rfc2497), [2590](https://datatracker.ietf.org/doc/html/rfc2590), [3146](https://datatracker.ietf.org/doc/html/rfc3146), [3572](https://datatracker.ietf.org/doc/html/rfc3572), [4291](https://datatracker.ietf.org/doc/html/rfc4291), [4338](https://datatracker.ietf.org/doc/html/rfc4338), [4391](https://datatracker.ietf.org/doc/html/rfc4391), [5072](https://datatracker.ietf.org/doc/html/rfc5072) and [5121](https://datatracker.ietf.org/doc/html/rfc5121).
+3. **[^](#cite_ref-IPv6Essentials_3-0)** Silvia Hagen (May 2006). [*IPv6 Essentials*](https://archive.org/details/ipv6essentials00hage) (Second ed.). O'Reilly. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-0-596-10058-2](/wiki/Special:BookSources/978-0-596-10058-2 "Special:BookSources/978-0-596-10058-2").
+4. ^ [***a***](#cite_ref-rfc3956_4-0) [***b***](#cite_ref-rfc3956_4-1) P. Savola; B. Haberman (November 2004). [*Embedding the Rendezvous Point (RP) Address in an IPv6 Multicast Address*](https://datatracker.ietf.org/doc/html/rfc3956). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3956](https://doi.org/10.17487%2FRFC3956). [RFC](/wiki/Request_for_Comments "Request for Comments") [3956](https://datatracker.ietf.org/doc/html/rfc3956). *Proposed Standard.* Updated by RFC [7371](https://datatracker.ietf.org/doc/html/rfc7371). Updates RFC [3306](https://datatracker.ietf.org/doc/html/rfc3306).
+5. ^ [***a***](#cite_ref-rfc3306_5-0) [***b***](#cite_ref-rfc3306_5-1) B. Haberman; D. Thaler (August 2002). [*Unicast-Prefix-based IPv6 Multicast Addresses*](https://datatracker.ietf.org/doc/html/rfc3306). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3306](https://doi.org/10.17487%2FRFC3306). [RFC](/wiki/Request_for_Comments "Request for Comments") [3306](https://datatracker.ietf.org/doc/html/rfc3306). *Proposed Standard.* Updated by RFC [3956](https://datatracker.ietf.org/doc/html/rfc3956), [4489](https://datatracker.ietf.org/doc/html/rfc4489) and [7371](https://datatracker.ietf.org/doc/html/rfc7371).
+6. **[^](#cite_ref-rfc4489_6-0)** J-S. Park; M-K. Shin; H-J. Kim (April 2006). [*A Method for Generating Link-Scoped IPv6 Multicast Addresses*](https://datatracker.ietf.org/doc/html/rfc4489). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4489](https://doi.org/10.17487%2FRFC4489). [RFC](/wiki/Request_for_Comments "Request for Comments") [4489](https://datatracker.ietf.org/doc/html/rfc4489). *Proposed Standard.* Updates RFC [3306](https://datatracker.ietf.org/doc/html/rfc3306).
+7. **[^](#cite_ref-Graziani2012_7-0)** Graziani, Rick (2012). [*IPv6 Fundamentals: A Straightforward Approach to Understanding IPv6*](https://books.google.com/books?id=FbYjJjZNA5gC&pg=PA55). [Cisco Press](/wiki/Cisco_Press "Cisco Press"). p. 55. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-0-13-303347-2](/wiki/Special:BookSources/978-0-13-303347-2 "Special:BookSources/978-0-13-303347-2").
+8. **[^](#cite_ref-Coffeen2014_8-0)** Coffeen, Tom (2014). [*IPv6 Address Planning: Designing an Address Plan for the Future*](https://books.google.com/books?id=dZU8BQAAQBAJ&pg=PT170). [O'Reilly Media](/wiki/O%27Reilly_Media "O'Reilly Media"). p. 170. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4919-0326-1](/wiki/Special:BookSources/978-1-4919-0326-1 "Special:BookSources/978-1-4919-0326-1").
+9. **[^](#cite_ref-rfc5952_10-0)** S. Kawamura; M. Kawashima (August 2010). [*A Recommendation for IPv6 Address Text Representation*](https://datatracker.ietf.org/doc/html/rfc5952). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC5952](https://doi.org/10.17487%2FRFC5952). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [5952](https://datatracker.ietf.org/doc/html/rfc5952). *Proposed Standard.* Updates RFC [4291](https://datatracker.ietf.org/doc/html/rfc4291).
+10. **[^](#cite_ref-rfc3986_11-0)** [T. Berners-Lee](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [R. Fielding](/wiki/Roy_Fielding "Roy Fielding"); [L. Masinter](/wiki/Larry_Masinter "Larry Masinter") (January 2005). [*Uniform Resource Identifier (URI): Generic Syntax*](https://datatracker.ietf.org/doc/html/rfc3986). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3986](https://doi.org/10.17487%2FRFC3986). STD 66. [RFC](/wiki/Request_for_Comments "Request for Comments") [3986](https://datatracker.ietf.org/doc/html/rfc3986). *Internet Standard 66.* Obsoletes RFC [2732](https://datatracker.ietf.org/doc/html/rfc2732), [2396](https://datatracker.ietf.org/doc/html/rfc2396) and [1808](https://datatracker.ietf.org/doc/html/rfc1808). Updated by RFC [6874](https://datatracker.ietf.org/doc/html/rfc6874), [7320](https://datatracker.ietf.org/doc/html/rfc7320) and [8820](https://datatracker.ietf.org/doc/html/rfc8820). Updates RFC [1738](https://datatracker.ietf.org/doc/html/rfc1738).
+11. ^ [***a***](#cite_ref-rfc4007_12-0) [***b***](#cite_ref-rfc4007_12-1) [S. Deering](/wiki/Steve_Deering "Steve Deering"); B. Haberman; T. Jinmei; E. Nordmark; B. Zill (March 2005). [*IPv6 Scoped Address Architecture*](https://datatracker.ietf.org/doc/html/rfc4007). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4007](https://doi.org/10.17487%2FRFC4007). [RFC](/wiki/Request_for_Comments "Request for Comments") [4007](https://datatracker.ietf.org/doc/html/rfc4007). *Proposed Standard.* Updated by RFC [7346](https://datatracker.ietf.org/doc/html/rfc7346).
+12. ^ [***a***](#cite_ref-FreeBSD_14-0) [***b***](#cite_ref-FreeBSD_14-1) `[inet6(4)](https://www.freebsd.org/cgi/man.cgi?query=inet6&sektion=4)` – [FreeBSD](/wiki/FreeBSD "FreeBSD") Kernel Interfaces [Manual](/wiki/Man_page "Man page") "The KAME implementation supports an extended numeric IPv6 address notation for link-local addresses, like "fe80::1%de0" [...] draft-ietf-ipngwg-scopedaddr-format-02.txt"
+13. **[^](#cite_ref-rfc6874_17-0)** [B. Carpenter](/wiki/Brian_Carpenter_(engineer) "Brian Carpenter (engineer)"); S. Cheshire; R. Hinden (February 2013). [*Representing IPv6 Zone Identifiers in Address Literals and Uniform Resource Identifiers*](https://datatracker.ietf.org/doc/html/rfc6874). [IETF](/wiki/IETF "IETF"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6874](https://doi.org/10.17487%2FRFC6874). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [6874](https://datatracker.ietf.org/doc/html/rfc6874). *Proposed Standard.* Updates RFC [3986](https://datatracker.ietf.org/doc/html/rfc3986).
+14. **[^](#cite_ref-18)** ["ipv6-literal.net Domain History"](http://www.who.is/domain-history/ipv6-literal.net). who.is. Retrieved 20 October 2014.
+15. **[^](#cite_ref-rfc7346_19-0)** R. Droms (August 2014). [*IPv6 Multicast Address Scopes*](https://datatracker.ietf.org/doc/html/rfc7346). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC7346](https://doi.org/10.17487%2FRFC7346). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [7346](https://datatracker.ietf.org/doc/html/rfc7346). *Proposed Standard.* Updates RFC [4007](https://datatracker.ietf.org/doc/html/rfc4007) and [4291](https://datatracker.ietf.org/doc/html/rfc4291).
+16. **[^](#cite_ref-rfc1881_20-0)** [Internet Architecture Board](/wiki/Internet_Architecture_Board "Internet Architecture Board"); [Internet Engineering Steering Group](/wiki/Internet_Engineering_Steering_Group "Internet Engineering Steering Group") (December 1995). [*IPv6 Address Allocation Management*](https://datatracker.ietf.org/doc/html/rfc1881). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1881](https://doi.org/10.17487%2FRFC1881). [RFC](/wiki/Request_for_Comments "Request for Comments") [1881](https://datatracker.ietf.org/doc/html/rfc1881). *Informational.*
+17. **[^](#cite_ref-21)** [IPv6 address space at IANA](https://www.iana.org/assignments/ipv6-address-space). Iana.org (2010-10-29). Retrieved on 2011-09-28.
+18. **[^](#cite_ref-22)** [IPv6 unicast address assignments](https://www.iana.org/assignments/ipv6-unicast-address-assignments/ipv6-unicast-address-assignments.xhtml), IANA
+19. **[^](#cite_ref-23)** [DE-TELEKOM-20050113](http://www.db.ripe.net/whois?form_type=simple&full_query_string=&searchtext=DE-TELEKOM-20050113&do_search=Search)[*[permanent dead link](/wiki/Wikipedia:Link_rot "Wikipedia:Link rot")*] db.ripe.net. Retrieved 2011-09-28.
+20. **[^](#cite_ref-24)** ["ARIN Number Resource Policy Manual: Initial allocation to ISPs"](https://www.arin.net/policy/nrpm.html#four22).
+21. **[^](#cite_ref-25)** ["RIPE NCC IPv6 Address Allocation and Assignment Policy: Minimum allocation"](http://www.ripe.net/ripe/docs/ripe-481#minimum_allocation).
+22. **[^](#cite_ref-26)** [for example](https://www.iana.org/assignments/ipv6-unicast-address-assignments/ipv6-unicast-address-assignments.xml). Iana.org. Retrieved on 2011-09-28.
+23. ^ [***a***](#cite_ref-rfc6177_27-0) [***b***](#cite_ref-rfc6177_27-1) [***c***](#cite_ref-rfc6177_27-2) T. Narten; G. Huston; L. Roberts (March 2011). [*IPv6 Address Assignment to End Sites*](https://datatracker.ietf.org/doc/html/rfc6177). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") (IETF). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6177](https://doi.org/10.17487%2FRFC6177). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). BCP 157. [RFC](/wiki/Request_for_Comments "Request for Comments") [6177](https://datatracker.ietf.org/doc/html/rfc6177). *Best Common Practice.* Obsoletes RFC [3177](https://datatracker.ietf.org/doc/html/rfc3177).
+24. **[^](#cite_ref-28)** ["IPv6 Addressing Plans"](https://getipv6.info/display/IPv6/IPv6+Addressing+Plans). ARIN IPv6 Wiki. Retrieved 2018-07-15. All customers get one */48* unless they can show that they need more than 65k subnets. [...] If you have lots of consumer customers you may want to assign */56*s to private residence sites.
+25. **[^](#cite_ref-29)** ["What are Bogons?"](https://www.sixxs.net/tools/grh/bogons/). Retrieved 2021-11-15.
+26. **[^](#cite_ref-30)** ["Address Space Managed by the RIPE NCC"](https://www.ripe.net/ripe/docs/ripe-510). Retrieved 2011-05-22.
+27. **[^](#cite_ref-rfc2526_31-0)** D. Johnson; [S. Deering](/wiki/Steve_Deering "Steve Deering") (March 1999). [*Reserved IPv6 Subnet Anycast Addresses*](https://datatracker.ietf.org/doc/html/rfc2526). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC2526](https://doi.org/10.17487%2FRFC2526). [RFC](/wiki/Request_for_Comments "Request for Comments") [2526](https://datatracker.ietf.org/doc/html/rfc2526). *Proposed Standard.*
+28. ^ [***a***](#cite_ref-rfc6890_32-0) [***b***](#cite_ref-rfc6890_32-1) M. Cotton; L. Vegoda; B. Haberman (April 2013). R. Bonica (ed.). [*Special-Purpose IP Address Registries*](https://datatracker.ietf.org/doc/html/rfc6890). [IETF](/wiki/IETF "IETF"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6890](https://doi.org/10.17487%2FRFC6890). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). BCP 153. [RFC](/wiki/Request_for_Comments "Request for Comments") [6890](https://datatracker.ietf.org/doc/html/rfc6890). *Best Common Practice.* Obsoletes RFC [4773](https://datatracker.ietf.org/doc/html/rfc4773), [5156](https://datatracker.ietf.org/doc/html/rfc5156), [5735](https://datatracker.ietf.org/doc/html/rfc5735) and [5736](https://datatracker.ietf.org/doc/html/rfc5736). Updated by RFC [8190](https://datatracker.ietf.org/doc/html/rfc8190).
+29. ^ [***a***](#cite_ref-rfc6052_33-0) [***b***](#cite_ref-rfc6052_33-1) C. Bao; [C. Huitema](/wiki/Christian_Huitema "Christian Huitema"); M. Bagnulo; M. Boucadair; X. Li (October 2010). [*IPv6 Addressing of IPv4/IPv6 Translators*](https://datatracker.ietf.org/doc/html/rfc6052). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") (IETF). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6052](https://doi.org/10.17487%2FRFC6052). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [6052](https://datatracker.ietf.org/doc/html/rfc6052). *Proposed Standard.* Updates RFC [4291](https://datatracker.ietf.org/doc/html/rfc4291).
+30. ^ [***a***](#cite_ref-rfc8215_34-0) [***b***](#cite_ref-rfc8215_34-1) T. Anderson (August 2017). [*Local-Use IPv4/IPv6 Translation Prefix*](https://datatracker.ietf.org/doc/html/rfc8215). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC8215](https://doi.org/10.17487%2FRFC8215). [RFC](/wiki/Request_for_Comments "Request for Comments") [8215](https://datatracker.ietf.org/doc/html/rfc8215). *Proposed Standard.*
+31. ^ [***a***](#cite_ref-rfc6666_35-0) [***b***](#cite_ref-rfc6666_35-1) N. Hilliard; D. Freedman (August 2012). [*A Discard Prefix for IPv6*](https://datatracker.ietf.org/doc/html/rfc6666). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6666](https://doi.org/10.17487%2FRFC6666). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [6666](https://datatracker.ietf.org/doc/html/rfc6666). *Informational.*
+32. **[^](#cite_ref-rfc4680_36-0)** S. Santesson (September 2006). [*TLS Handshake Message for Supplemental Data*](https://datatracker.ietf.org/doc/html/rfc4680). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4680](https://doi.org/10.17487%2FRFC4680). [RFC](/wiki/Request_for_Comments "Request for Comments") [4680](https://datatracker.ietf.org/doc/html/rfc4680). *Proposed Standard.* Updates RFC [4346](https://datatracker.ietf.org/doc/html/rfc4346). Updated by RFC [8447](https://datatracker.ietf.org/doc/html/rfc8447) and [8996](https://datatracker.ietf.org/doc/html/rfc8996).
+33. ^ [***a***](#cite_ref-rfc7343_37-0) [***b***](#cite_ref-rfc7343_37-1) [***c***](#cite_ref-rfc7343_37-2) J. Laganier; F. Dupont (September 2014). [*An IPv6 Prefix for Overlay Routable Cryptographic Hash Identifiers Version 2 (ORCHIDv2)*](https://datatracker.ietf.org/doc/html/rfc7343). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC7343](https://doi.org/10.17487%2FRFC7343). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [7343](https://datatracker.ietf.org/doc/html/rfc7343). *Proposed Standard.* Obsoletes RFC [4843](https://datatracker.ietf.org/doc/html/rfc4843).
+34. ^ [***a***](#cite_ref-rfc3849_38-0) [***b***](#cite_ref-rfc3849_38-1) G. Huston; A. Lord; P. Smith (July 2004). [*IPv6 Address Prefix Reserved for Documentation*](https://datatracker.ietf.org/doc/html/rfc3849). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3849](https://doi.org/10.17487%2FRFC3849). [RFC](/wiki/Request_for_Comments "Request for Comments") [3849](https://datatracker.ietf.org/doc/html/rfc3849). *Informational.*
+35. ^ [***a***](#cite_ref-rfc7526_39-0) [***b***](#cite_ref-rfc7526_39-1) [***c***](#cite_ref-rfc7526_39-2) O. Troan (May 2015). [B. Carpenter](/wiki/Brian_Carpenter_(engineer) "Brian Carpenter (engineer)") (ed.). [*Deprecating the Anycast Prefix for 6to4 Relay Routers*](https://datatracker.ietf.org/doc/html/rfc7526). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC7526](https://doi.org/10.17487%2FRFC7526). BCP 196. [RFC](/wiki/Request_for_Comments "Request for Comments") [7526](https://datatracker.ietf.org/doc/html/rfc7526). *Best Current Practice.* Obsoletes RFC [3068](https://datatracker.ietf.org/doc/html/rfc3068) and [6732](https://datatracker.ietf.org/doc/html/rfc6732).
+36. **[^](#cite_ref-draft-ietf-6man-sids-06_40-0)** Krishnan, S. (2024-02-15). [*SRv6 Segment Identifiers in the IPv6 Addressing Architecture*](https://datatracker.ietf.org/doc/html/draft-ietf-6man-sids-06). [IETF](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). I-D draft-ietf-6man-sids-06. Retrieved 2024-06-13.
+37. ^ [***a***](#cite_ref-rfc4193_41-0) [***b***](#cite_ref-rfc4193_41-1) [***c***](#cite_ref-rfc4193_41-2) [***d***](#cite_ref-rfc4193_41-3) R. Hinden; B. Haberman (October 2005). [*Unique Local IPv6 Unicast Addresses*](https://datatracker.ietf.org/doc/html/rfc4193). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4193](https://doi.org/10.17487%2FRFC4193). [RFC](/wiki/Request_for_Comments "Request for Comments") [4193](https://datatracker.ietf.org/doc/html/rfc4193). *Proposed Standard.*
+38. **[^](#cite_ref-rfc7915_42-0)** C. Bao; X. Li; [F. Baker](/wiki/Fred_Baker_(IETF_chair) "Fred Baker (IETF chair)"); T. Anderson; F. Gont (June 2016). [*IP/ICMP Translation Algorithm*](https://datatracker.ietf.org/doc/html/rfc7915). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") (IETF). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC7915](https://doi.org/10.17487%2FRFC7915). [RFC](/wiki/Request_for_Comments "Request for Comments") [7915](https://datatracker.ietf.org/doc/html/rfc7915). *Proposed Standard.* Obsoletes RFC [6145](https://datatracker.ietf.org/doc/html/rfc6145).
+39. **[^](#cite_ref-rfc2928_43-0)** R. Hinden; [S. Deering](/wiki/Steve_Deering "Steve Deering"); R. Fink; T. Hain (September 2000). [*Initial IPv6 Sub-TLA ID Assignments*](https://datatracker.ietf.org/doc/html/rfc2928). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC2928](https://doi.org/10.17487%2FRFC2928). [RFC](/wiki/Request_for_Comments "Request for Comments") [2928](https://datatracker.ietf.org/doc/html/rfc2928). *Informational.*
+40. **[^](#cite_ref-rfc5180_44-0)** C. Popoviciu; A. Hamza; G. Van de Velde; D. Dugatkin (May 2008). [*IPv6 Benchmarking Methodology for Network Interconnect Devices*](https://datatracker.ietf.org/doc/html/rfc5180). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC5180](https://doi.org/10.17487%2FRFC5180). [RFC](/wiki/Request_for_Comments "Request for Comments") [5180](https://datatracker.ietf.org/doc/html/rfc5180). *Informational.*
+41. **[^](#cite_ref-rfc5737_45-0)** J. Arkko; M. Cotton; L. Vegoda (January 2010). [*IPv4 Address Blocks Reserved for Documentation*](https://datatracker.ietf.org/doc/html/rfc5737). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC5737](https://doi.org/10.17487%2FRFC5737). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [5737](https://datatracker.ietf.org/doc/html/rfc5737). *Informational.* Updates RFC [1166](https://datatracker.ietf.org/doc/html/rfc1166).
+42. **[^](#cite_ref-47)** [IANA Internet Protocol Version 6 Multicast Addresses](https://www.iana.org/assignments/ipv6-multicast-addresses).
+43. **[^](#cite_ref-rfc4862_48-0)** S. Thomson; T. Narten; T. Jinmei (September 2007). [*IPv6 Stateless Address Autoconfiguration*](https://datatracker.ietf.org/doc/html/rfc4862). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4862](https://doi.org/10.17487%2FRFC4862). [RFC](/wiki/Request_for_Comments "Request for Comments") [4862](https://datatracker.ietf.org/doc/html/rfc4862). *Draft Standard.* Obsoletes RFC [2462](https://datatracker.ietf.org/doc/html/rfc2462). Updated by RFC [7527](https://datatracker.ietf.org/doc/html/rfc7527).
+44. **[^](#cite_ref-rfc4861_49-0)** T. Narten; E. Nordmark; W. Simpson; H. Holiman (September 2007). [*Neighbor Discovery for IP version 6 (IPv6)*](https://datatracker.ietf.org/doc/html/rfc4861). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4861](https://doi.org/10.17487%2FRFC4861). [RFC](/wiki/Request_for_Comments "Request for Comments") [4861](https://datatracker.ietf.org/doc/html/rfc4861). *Draft Standard.* Obsoletes RFC [2461](https://datatracker.ietf.org/doc/html/rfc2461). Updated by RFC [5942](https://datatracker.ietf.org/doc/html/rfc5942), [6980](https://datatracker.ietf.org/doc/html/rfc6980), [7048](https://datatracker.ietf.org/doc/html/rfc7048), [7527](https://datatracker.ietf.org/doc/html/rfc7527), [7559](https://datatracker.ietf.org/doc/html/rfc7559), [8028](https://datatracker.ietf.org/doc/html/rfc8028), [8319](https://datatracker.ietf.org/doc/html/rfc8319), [8425](https://datatracker.ietf.org/doc/html/rfc8425) and [9131](https://datatracker.ietf.org/doc/html/rfc9131).
+45. **[^](#cite_ref-51)** 
+Iljitsch van Beijnum (2006). ["IPv6 Internals"](http://www.cisco.com/web/about/ac123/ac147/archived_issues/ipj_9-3/ipv6_internals.html). *The Internet Protocol Journal*. Vol. 9, no. 3. pp. 16–29.
+46. **[^](#cite_ref-53)** [The privacy implications of stateless IPv6 addressing](http://portal.acm.org/citation.cfm?id=1852723&dl=GUIDE&coll=GUIDE&CFID=103687796&CFTOKEN=17254293). Portal.acm.org (2010-04-21). Retrieved on 2011-09-28.
+47. **[^](#cite_ref-rfc8981_54-0)** F. Gont; S. Krishnan; T. Narten; R. Draves (February 2021). [*Temporary Address Extensions for Stateless Address Autoconfiguration in IPv6*](https://datatracker.ietf.org/doc/html/rfc8981). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC8981](https://doi.org/10.17487%2FRFC8981). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [8981](https://datatracker.ietf.org/doc/html/rfc8981). *Proposed Standard.* Obsoletes [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [4941](https://datatracker.ietf.org/doc/html/rfc4941).
+48. **[^](#cite_ref-55)** ["IPv6 on Windows"](https://www.networkacademy.io/ccna/ipv6/ipv6-on-windows). Retrieved 2024-03-25.
+49. **[^](#cite_ref-rfc3972_56-0)** T. Aura (March 2005). [*Cryptographically Generated Addresses (CGA)*](https://datatracker.ietf.org/doc/html/rfc3972). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3972](https://doi.org/10.17487%2FRFC3972). [RFC](/wiki/Request_for_Comments "Request for Comments") [3972](https://datatracker.ietf.org/doc/html/rfc3972). *Proposed Standard.* Updated by RFC [4581](https://datatracker.ietf.org/doc/html/rfc4581) and [4982](https://datatracker.ietf.org/doc/html/rfc4982).
+50. ^ [***a***](#cite_ref-rfc7217_58-0) [***b***](#cite_ref-rfc7217_58-1) F. Gont (April 2014). [*A Method for Generating Semantically Opaque Interface Identifiers with IPv6 Stateless Address Autoconfiguration (SLAAC)*](https://datatracker.ietf.org/doc/html/rfc7217). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC7217](https://doi.org/10.17487%2FRFC7217). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [7217](https://datatracker.ietf.org/doc/html/rfc7217). *Proposed Standard.*
+51. **[^](#cite_ref-rfc6724_59-0)** D. Thaler; R. Draves; A. Matsumoto; T. Chown (September 2012). D. Thaler (ed.). [*Default Address Selection for Internet Protocol Version 6 (IPv6)*](https://datatracker.ietf.org/doc/html/rfc6724). [IETF](/wiki/IETF "IETF"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6724](https://doi.org/10.17487%2FRFC6724). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2070-1721](https://www.worldcat.org/issn/2070-1721). [RFC](/wiki/Request_for_Comments "Request for Comments") [6724](https://datatracker.ietf.org/doc/html/rfc6724). *Proposed Standard.* Obsoletes RFC [3484](https://datatracker.ietf.org/doc/html/rfc3484).
+52. **[^](#cite_ref-rfc3596_60-0)** S. Thomson; C. Huitema; V. Ksinant; M. Souissi (October 2003). [*DNS Extensions to Support IP Version 6*](https://datatracker.ietf.org/doc/html/rfc3596). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3596](https://doi.org/10.17487%2FRFC3596). [RFC](/wiki/Request_for_Comments "Request for Comments") [3596](https://datatracker.ietf.org/doc/html/rfc3596). *Internet Standard.* Obsoletes RFC [3152](https://datatracker.ietf.org/doc/html/rfc3152) and [1886](https://datatracker.ietf.org/doc/html/rfc1886).
+53. ^ [***a***](#cite_ref-rfc1884_61-0) [***b***](#cite_ref-rfc1884_61-1) R. Hinden; [S. Deering](/wiki/Steve_Deering "Steve Deering") (December 1995). [*IP Version 6 Addressing Architecture*](https://datatracker.ietf.org/doc/html/rfc1884). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1884](https://doi.org/10.17487%2FRFC1884). [RFC](/wiki/Request_for_Comments "Request for Comments") [1884](https://datatracker.ietf.org/doc/html/rfc1884). *Obsolete.* Obsoleted by RFC [2373](https://datatracker.ietf.org/doc/html/rfc2373).
+54. **[^](#cite_ref-rfc3879_62-0)** [C. Huitema](/wiki/Christian_Huitema "Christian Huitema"); B. Carpenter (September 2004). [*Deprecating Site Local Addresses*](https://datatracker.ietf.org/doc/html/rfc3879). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3879](https://doi.org/10.17487%2FRFC3879). [RFC](/wiki/Request_for_Comments "Request for Comments") [3879](https://datatracker.ietf.org/doc/html/rfc3879). *Proposed Standard.*
+55. **[^](#cite_ref-rfc4147_63-0)** G. Houston (Aug 2005). [*Proposed Changes to the Format of the IANA IPv6 Registry*](https://datatracker.ietf.org/doc/html/rfc4147). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4147](https://doi.org/10.17487%2FRFC4147). [RFC](/wiki/Request_for_Comments "Request for Comments") [4147](https://datatracker.ietf.org/doc/html/rfc4147). *Informational.*
+56. **[^](#cite_ref-rfc1888_64-0)** J. Bound; B. Carpenter; D. Harrington; J. Houldsworth; A. Lloyd (August 1996). [*OSI NSAPs and IPv6*](https://datatracker.ietf.org/doc/html/rfc1888). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1888](https://doi.org/10.17487%2FRFC1888). [RFC](/wiki/Request_for_Comments "Request for Comments") [1888](https://datatracker.ietf.org/doc/html/rfc1888). *Obsolete.* Obsoleted by RFC [4048](https://datatracker.ietf.org/doc/html/rfc4048). Updated by [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [4548](https://datatracker.ietf.org/doc/html/rfc4548).
+57. **[^](#cite_ref-rfc4048_65-0)** B. Carpenter (Apr 2005). [*RFC 1888 Is Obsolete*](https://datatracker.ietf.org/doc/html/rfc4048). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4048](https://doi.org/10.17487%2FRFC4048). [RFC](/wiki/Request_for_Comments "Request for Comments") [4048](https://datatracker.ietf.org/doc/html/rfc4048). *Informational.* Updated by RFC [4548](https://datatracker.ietf.org/doc/html/rfc4548).
+58. **[^](#cite_ref-rfc2471_66-0)** R. Hinde; R. Fink; [J. Postel](/wiki/Jon_Postel "Jon Postel") (December 1998). [*IPv6 Testing Address Allocation*](https://datatracker.ietf.org/doc/html/rfc2471). Network Working Grouop. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC2471](https://doi.org/10.17487%2FRFC2471). [RFC](/wiki/Request_for_Comments "Request for Comments") [2471](https://datatracker.ietf.org/doc/html/rfc2471). *Obsolete.* Obsoleted by RFC [3701](https://datatracker.ietf.org/doc/html/rfc3701). Obsoletes RFC [1897](https://datatracker.ietf.org/doc/html/rfc1897).
+59. **[^](#cite_ref-rfc3701_67-0)** R. Fink; R. Hinden (March 2004). [*6bone (IPv6 Testing Address Allocation) Phaseout*](https://datatracker.ietf.org/doc/html/rfc3701). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3701](https://doi.org/10.17487%2FRFC3701). [RFC](/wiki/Request_for_Comments "Request for Comments") [3701](https://datatracker.ietf.org/doc/html/rfc3701). *Informational.* Obsoletes RFC [2471](https://datatracker.ietf.org/doc/html/rfc2471).
+60. **[^](#cite_ref-rfc4843_68-0)** P. Nikander; J. Laganier; F. Dupont (April 2007). [*An IPv6 Prefix for Overlay Routable Cryptographic Hash Identifiers (ORCHID)*](https://datatracker.ietf.org/doc/html/rfc4843). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4843](https://doi.org/10.17487%2FRFC4843). [RFC](/wiki/Request_for_Comments "Request for Comments") [4843](https://datatracker.ietf.org/doc/html/rfc4843). *Obsolete.* Obsoleted by RFC [7343](https://datatracker.ietf.org/doc/html/rfc7343).
+61. **[^](#cite_ref-rfc3152_69-0)** R. Bush (August 2001). [*Delegation of IP6.ARPA*](https://datatracker.ietf.org/doc/html/rfc3152). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3152](https://doi.org/10.17487%2FRFC3152). BCP 49. [RFC](/wiki/Request_for_Comments "Request for Comments") [3152](https://datatracker.ietf.org/doc/html/rfc3152). *Obsolete.* Obsoleted by RFC [3596](https://datatracker.ietf.org/doc/html/rfc3596). Updates RFC [1886](https://datatracker.ietf.org/doc/html/rfc1886), [2553](https://datatracker.ietf.org/doc/html/rfc2553), [2766](https://datatracker.ietf.org/doc/html/rfc2766), [2772](https://datatracker.ietf.org/doc/html/rfc2772) and [2874](https://datatracker.ietf.org/doc/html/rfc2874)
+62. **[^](#cite_ref-rfc3177_70-0)** [IAB](/wiki/Internet_Architecture_Board "Internet Architecture Board"); [IESG](/wiki/Internet_Engineering_Steering_Group "Internet Engineering Steering Group") (September 2001). [*IAB/IESG Recommendations on IPv6 Address Allocations to Sites*](https://datatracker.ietf.org/doc/html/rfc3177). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3177](https://doi.org/10.17487%2FRFC3177). [RFC](/wiki/Request_for_Comments "Request for Comments") [3177](https://datatracker.ietf.org/doc/html/rfc3177). *Obsolete.* Obsoleted by RFC [6177](https://datatracker.ietf.org/doc/html/rfc6177).
+63. **[^](#cite_ref-rfc1886_71-0)** S. Thomson; C. Huitema (December 1995). [*DNS Extensions to support IP version 6*](https://datatracker.ietf.org/doc/html/rfc1886). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1886](https://doi.org/10.17487%2FRFC1886). [RFC](/wiki/Request_for_Comments "Request for Comments") [1886](https://datatracker.ietf.org/doc/html/rfc1886). *Obsolete.* Obsoleted by [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [3596](https://datatracker.ietf.org/doc/html/rfc3596). Updated by RFC [2874](https://datatracker.ietf.org/doc/html/rfc2874) and [3152](https://datatracker.ietf.org/doc/html/rfc3152).
+64. **[^](#cite_ref-rfc2874_72-0)** M. Crawford; C. Huitema (July 2000). [*DNS Extensions to Support IPv6 Address Aggregation and Renumbering*](https://datatracker.ietf.org/doc/html/rfc2874). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC2874](https://doi.org/10.17487%2FRFC2874). [RFC](/wiki/Request_for_Comments "Request for Comments") [2874](https://datatracker.ietf.org/doc/html/rfc2874). *Historic.* Updated by RFC [3152](https://datatracker.ietf.org/doc/html/rfc3152), [3226](https://datatracker.ietf.org/doc/html/rfc3226), [3363](https://datatracker.ietf.org/doc/html/rfc3363) and [3364](https://datatracker.ietf.org/doc/html/rfc3364). Updates RFC [1886](https://datatracker.ietf.org/doc/html/rfc1886).
+65. **[^](#cite_ref-73)** [Comparison of AAAA and A6 (do we really need A6?)](https://tools.ietf.org/html/draft-ietf-dnsext-aaaa-a6-01), Jun-ichiro itojun Hagino, (July 2001)
+66. ^ [***a***](#cite_ref-rfc3363_74-0) [***b***](#cite_ref-rfc3363_74-1) R. Bush; A. Durand; B. Fink; O. Gudmundsson; T. Hain, eds. (August 2002). [*Representing Internet Protocol version 6 (IPv6) Addresses in the Domain Name System (DNS)*](https://datatracker.ietf.org/doc/html/rfc3363). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3363](https://doi.org/10.17487%2FRFC3363). [RFC](/wiki/Request_for_Comments "Request for Comments") [3363](https://datatracker.ietf.org/doc/html/rfc3363). *Informational.* Updates RFC [2673](https://datatracker.ietf.org/doc/html/rfc2673), [2874](https://datatracker.ietf.org/doc/html/rfc2874).
+67. **[^](#cite_ref-rfc3364_75-0)** R. Austein (August 2002). [*Tradeoffs in Domain Name System (DNS) Support for Internet Protocol version 6 (IPv6)*](https://datatracker.ietf.org/doc/html/rfc3364). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC3364](https://doi.org/10.17487%2FRFC3364). [RFC](/wiki/Request_for_Comments "Request for Comments") [3364](https://datatracker.ietf.org/doc/html/rfc3364). *Informational.* Updates RFC [2673](https://datatracker.ietf.org/doc/html/rfc2673), [2874](https://datatracker.ietf.org/doc/html/rfc2874).
+68. ^ [***a***](#cite_ref-rfc6536_76-0) [***b***](#cite_ref-rfc6536_76-1) A. Bierman; M. Bjorklund (March 2012). [*Network Configuration Protocol (NETCONF) Access Control Model*](https://datatracker.ietf.org/doc/html/rfc6536). [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force"). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC6536](https://doi.org/10.17487%2FRFC6536). [RFC](/wiki/Request_for_Comments "Request for Comments") [6536](https://datatracker.ietf.org/doc/html/rfc6536). *Obsolete.* Obsoleted by [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [8341](https://datatracker.ietf.org/doc/html/rfc8341).
+69. **[^](#cite_ref-rfc4074_77-0)** Y. Morishita; T. Jinmei (May 2005). [*Common Misbehavior Against DNS Queries for IPv6 Addresses*](https://datatracker.ietf.org/doc/html/rfc4074). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC4074](https://doi.org/10.17487%2FRFC4074). [RFC](/wiki/Request_for_Comments "Request for Comments") [4074](https://datatracker.ietf.org/doc/html/rfc4074). *Informational.*
+
+External links
+--------------
+
+[[edit](/w/index.php?title=IPv6_address&action=edit&section=45 "Edit section: External links")]
+* [IP Version 6 multicast addresses](https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xhtml)
+* Beijnum, van, Iljitsch (2005). *Running IPv6*. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-59059-527-5](/wiki/Special:BookSources/978-1-59059-527-5 "Special:BookSources/978-1-59059-527-5").
+* R. Elz (1 April 1996). [*A Compact Representation of IPv6 Addresses*](https://datatracker.ietf.org/doc/html/rfc1924). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1924](https://doi.org/10.17487%2FRFC1924). [RFC](/wiki/Request_for_Comments "Request for Comments") [1924](https://datatracker.ietf.org/doc/html/rfc1924). *Informational.* This is an [April Fools' Day Request for Comments](/wiki/April_Fools%27_Day_Request_for_Comments "April Fools' Day Request for Comments"). Represent any IPv6 address in 20 octets. This [humorous RFC](/wiki/April_Fools%27_Day_Request_for_Comments "April Fools' Day Request for Comments") specifies an alternative way of representing IPv6 addresses, using a base-85 encoding.
+
+| * [v](/wiki/Template:IPv6 "Template:IPv6") * [t](/wiki/Template_talk:IPv6 "Template talk:IPv6") * [e](/wiki/Special:EditPage/Template:IPv6 "Special:EditPage/Template:IPv6") [Internet Protocol](/wiki/Internet_Protocol "Internet Protocol") [version 6](/wiki/IPv6 "IPv6") | |
+| --- | --- |
+| General | * [IPv6](/wiki/IPv6 "IPv6") * IPv6 address * [IPv6 packet](/wiki/IPv6_packet "IPv6 packet") * [Mobile IPv6](/wiki/Mobile_IP#Changes_in_IPv6_for_Mobile_IPv6 "Mobile IP") |
+| Deployment | * [IPv6 deployment](/wiki/IPv6_deployment "IPv6 deployment") 	+ [6rd](/wiki/6rd "6rd") * [World IPv6 Day and World IPv6 Launch Day](/wiki/World_IPv6_Day_and_World_IPv6_Launch_Day "World IPv6 Day and World IPv6 Launch Day") * [Comparison of IPv6 support in operating systems](/wiki/Comparison_of_IPv6_support_in_operating_systems "Comparison of IPv6 support in operating systems") * [Comparison of IPv6 support in common applications](/wiki/Comparison_of_IPv6_support_in_common_applications "Comparison of IPv6 support in common applications") |
+| IPv4 to IPv6 topics | * [IPv4 address exhaustion](/wiki/IPv4_address_exhaustion "IPv4 address exhaustion") * [IPv6 transition mechanism](/wiki/IPv6_transition_mechanism "IPv6 transition mechanism") |
+| Related protocols | * [DHCPv6](/wiki/DHCPv6 "DHCPv6") * [ICMPv6](/wiki/Internet_Control_Message_Protocol_for_IPv6 "Internet Control Message Protocol for IPv6") 	+ [Neighbor Discovery Protocol](/wiki/Neighbor_Discovery_Protocol "Neighbor Discovery Protocol") 	+ [Multicast Listener Discovery](/wiki/Multicast_Listener_Discovery "Multicast Listener Discovery") 	+ [Secure Neighbor Discovery](/wiki/Secure_Neighbor_Discovery "Secure Neighbor Discovery") 	+ [Multicast router discovery](/wiki/Multicast_router_discovery "Multicast router discovery") * [Site Multihoming by IPv6 Intermediation](/wiki/Site_Multihoming_by_IPv6_Intermediation "Site Multihoming by IPv6 Intermediation") |
+
+![](https://login.wikimedia.org/wiki/Special:CentralAutoLogin/start?type=1x1)
+Retrieved from "<https://en.wikipedia.org/w/index.php?title=IPv6_address&oldid=1235077238>"
